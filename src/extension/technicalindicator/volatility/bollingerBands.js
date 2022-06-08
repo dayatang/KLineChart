@@ -38,7 +38,7 @@ export default {
   name: 'BOLL',
   shortName: 'BOLL',
   calcParams: [26, { value: 2, allowDecimal: true }],
-  precision: 2,
+  precision: 5,
   shouldOhlc: true,
   plots: [
     { key: 'up', title: 'UP: ', type: 'line' },
