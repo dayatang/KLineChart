@@ -72,6 +72,7 @@ declare namespace klinecharts {
     baseValue?: number;
     color?: (data: TechnicalIndicatorPlotCallbackData, options: any) => string;
     isStroke?: (data: TechnicalIndicatorPlotCallbackData) => boolean;
+    isDashed?: (data: TechnicalIndicatorPlotCallbackData) => boolean;
   }
   
   interface TechnicalIndicator {
@@ -82,6 +83,7 @@ declare namespace klinecharts {
     shouldOhlc?: boolean;
     shouldFormatBigNumber?: boolean;
     styles?: any;
+    extendData?: ((params?: any) => any) | any;
   }
   
   interface TechnicalIndicatorRenderDataSource extends DataSource {}
@@ -149,15 +151,15 @@ declare namespace klinecharts {
   
   interface OverrideShape {
     id?: string;
+    points?: Point[];
     styles?: any;
     lock?: boolean;
     mode?: ShapeMode;
-    data?: any;
+    data?: ((params?: any) => any) | any;
   }
   
   interface Shape extends OverrideShape {
     name: string;
-    points?: Point[];
     onDrawStart?: (event: ShapeEvent) => void;
     onDrawing?: (event: ShapeEvent) => void;
     onDrawEnd?: (event: ShapeEvent) => void;
@@ -268,6 +270,7 @@ declare namespace klinecharts {
   interface PaneOptions {
     id?: string;
     height?: number;
+    minHeight?: number;
     dragEnabled?: boolean;
   }
 
