@@ -1,16 +1,15 @@
-<p align="center">
-  <a href="https://github.com/liihuu/KLineChart">
-    <img style="width: 160px" src="https://cdn.nlark.com/yuque/0/2022/png/8403091/1646572140298-assets/web-upload/16d5552a-3a7d-43a0-a5cb-079274af1df6.png"/>
+<div align="center">
+  <a href="https://klinecharts.com">
+    <img style="height: 110px" src="https://cdn.nlark.com/yuque/0/2023/png/8403091/1673888439816-assets/web-upload/2264ae9d-157e-43bd-8646-60bc97c19d8f.png"/>
   </a>
-</p>
-<h1 align="center" style="margin-top: -16px">KLineChart</h1>
+</div>
+<h1 align="center">KLineChart</h1>
 <p align="center">💹📈Lightweight k-line chart built with html5 canvas.</p>
 <div align="center">
 
 [![Version](https://badgen.net/npm/v/klinecharts)](https://www.npmjs.com/package/klinecharts)
 [![Build Status](https://travis-ci.org/liihuu/KLineChart.svg?branch=master)](https://travis-ci.org/liihuu/KLineChart)
 [![Size](https://badgen.net/bundlephobia/minzip/klinecharts@latest)](https://bundlephobia.com/result?p=klinecharts@latest)
-[![Dependencies](https://status.david-dm.org/gh/liihuu/KLineChart.svg)](https://github.com/liihuu/KLineChart)
 [![Typescript](https://badgen.net/npm/types/klinecharts)](types/index.d.ts)
 [![LICENSE](https://badgen.net/github/license/liihuu/KLineChart)](LICENSE)
 
