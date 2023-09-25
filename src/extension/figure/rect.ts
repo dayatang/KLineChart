@@ -14,15 +14,30 @@
 
 import Coordinate from '../../common/Coordinate'
 import { RectStyle, PolygonType, LineType } from '../../common/Options'
+import { transparent } from '../../common/utils/color'
+import { isString } from '../../common/utils/typeChecks'
 
-import { FigureTemplate } from '../../component/Figure'
+import { FigureTemplate, DEVIATION } from '../../component/Figure'
 
 export function checkCoordinateOnRect (coordinate: Coordinate, rect: RectAttrs): boolean {
+  let x = rect.x
+  let width = rect.width
+  if (width < DEVIATION * 2) {
+    x -= DEVIATION
+    width = DEVIATION * 2
+  }
+  let y = rect.y
+  let height = rect.height
+  if (height < DEVIATION * 2) {
+    y -= DEVIATION
+    height = DEVIATION * 2
+  }
+
   return (
-    coordinate.x >= rect.x &&
-    coordinate.x <= rect.x + rect.width &&
-    coordinate.y >= rect.y &&
-    coordinate.y <= rect.y + rect.height
+    coordinate.x >= x &&
+    coordinate.x <= x + width &&
+    coordinate.y >= y &&
+    coordinate.y <= y + height
   )
 }
 
@@ -30,25 +45,34 @@ export function drawRect (ctx: CanvasRenderingContext2D, attrs: RectAttrs, style
   const { x, y, width: w, height: h } = attrs
   const {
     style = PolygonType.Fill,
-    color = 'currentColor',
+    color = 'transparent',
     borderSize = 1,
-    borderColor = 'currentColor',
+    borderColor = 'transparent',
     borderStyle = LineType.Solid,
     borderRadius: r = 0,
     borderDashedValue = [2, 2]
   } = styles
   if (style === PolygonType.Fill || styles.style === PolygonType.StrokeFill) {
-    ctx.fillStyle = color
-    ctx.beginPath()
-    ctx.moveTo(x + r, y)
-    ctx.arcTo(x + w, y, x + w, y + h, r)
-    ctx.arcTo(x + w, y + h, x, y + h, r)
-    ctx.arcTo(x, y + h, x, y, r)
-    ctx.arcTo(x, y, x + w, y, r)
-    ctx.closePath()
-    ctx.fill()
+    let draw = true
+    if (isString(color)) {
+      draw = !transparent(color)
+    }
+    if (draw) {
+      ctx.fillStyle = color
+      ctx.beginPath()
+      ctx.moveTo(x + r, y)
+      ctx.arcTo(x + w, y, x + w, y + h, r)
+      ctx.arcTo(x + w, y + h, x, y + h, r)
+      ctx.arcTo(x, y + h, x, y, r)
+      ctx.arcTo(x, y, x + w, y, r)
+      ctx.closePath()
+      ctx.fill()
+    }
   }
-  if (style === PolygonType.Stroke || styles.style === PolygonType.StrokeFill) {
+  if (
+    (style === PolygonType.Stroke || styles.style === PolygonType.StrokeFill) &&
+    (!transparent(borderColor) && borderSize >= 0)
+  ) {
     ctx.strokeStyle = borderColor
     ctx.lineWidth = borderSize
     if (borderStyle === LineType.Dashed) {

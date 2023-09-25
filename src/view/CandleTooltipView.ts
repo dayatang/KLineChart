@@ -28,7 +28,7 @@ import Indicator from '../component/Indicator'
 
 import IndicatorTooltipView from './IndicatorTooltipView'
 
-import { TooltipIconInfo } from '../store/TooltipStore'
+import { TooltipIcon } from '../store/TooltipStore'
 
 import { i18n } from '../extension/i18n/index'
 
@@ -42,7 +42,7 @@ export default class CandleTooltipView extends IndicatorTooltipView {
     const pane = widget.getPane()
     const paneId = pane.getId()
     const chartStore = pane.getChart().getChartStore()
-    const crosshair = chartStore.getCrosshairStore().get()
+    const crosshair = chartStore.getTooltipStore().getCrosshair()
     if (crosshair.kLineData !== undefined) {
       const bounding = widget.getBounding()
       const yAxisBounding = pane.getYAxisWidget()?.getBounding() as Bounding
@@ -51,7 +51,7 @@ export default class CandleTooltipView extends IndicatorTooltipView {
       const locale = chartStore.getLocale()
       const customApi = chartStore.getCustomApi()
       const thousandsSeparator = chartStore.getThousandsSeparator()
-      const activeIconInfo = chartStore.getTooltipStore().getActiveIconInfo()
+      const activeIcon = chartStore.getTooltipStore().getActiveIcon()
       const indicators = chartStore.getIndicatorStore().getInstances(pane.getId())
       const dateTimeFormat = chartStore.getTimeScaleStore().getDateTimeFormat()
       const styles = chartStore.getStyles()
@@ -76,15 +76,15 @@ export default class CandleTooltipView extends IndicatorTooltipView {
         indicatorStyles.tooltip.showType === TooltipShowType.Standard
       ) {
         const top = this._drawCandleStandardTooltip(
-          ctx, dataList, paneId, bounding, crosshair, activeIconInfo, precision,
+          ctx, dataList, paneId, bounding, crosshair, activeIcon, precision,
           dateTimeFormat, locale, customApi, thousandsSeparator, candleStyles
         )
-        this.drawIndicatorTooltip(ctx, paneId, dataList, crosshair, activeIconInfo, indicators, customApi, thousandsSeparator, bounding, indicatorStyles, top)
+        this.drawIndicatorTooltip(ctx, paneId, dataList, crosshair, activeIcon, indicators, customApi, thousandsSeparator, bounding, indicatorStyles, top)
       } else if (
         candleStyles.tooltip.showType === TooltipShowType.Rect &&
         indicatorStyles.tooltip.showType === TooltipShowType.Standard
       ) {
-        const top = this.drawIndicatorTooltip(ctx, paneId, dataList, crosshair, activeIconInfo, indicators, customApi, thousandsSeparator, bounding, indicatorStyles, 0)
+        const top = this.drawIndicatorTooltip(ctx, paneId, dataList, crosshair, activeIcon, indicators, customApi, thousandsSeparator, bounding, indicatorStyles, 0)
         const isDrawCandleTooltip = this.isDrawTooltip(crosshair, candleStyles.tooltip)
         this._drawRectTooltip(
           ctx, dataList, indicators,
@@ -96,7 +96,7 @@ export default class CandleTooltipView extends IndicatorTooltipView {
         )
       } else {
         const top = this._drawCandleStandardTooltip(
-          ctx, dataList, paneId, bounding, crosshair, activeIconInfo, precision,
+          ctx, dataList, paneId, bounding, crosshair, activeIcon, precision,
           dateTimeFormat, locale, customApi, thousandsSeparator, candleStyles
         )
         const isDrawIndicatorTooltip = this.isDrawTooltip(crosshair, indicatorStyles.tooltip)
@@ -118,7 +118,7 @@ export default class CandleTooltipView extends IndicatorTooltipView {
     paneId: string,
     bounding: Bounding,
     crosshair: Crosshair,
-    activeTooltipIconInfo: Nullable<TooltipIconInfo>,
+    activeTooltipIcon: Nullable<TooltipIcon>,
     precision: Precision,
     dateTimeFormat: Intl.DateTimeFormat,
     locale: string,
@@ -141,7 +141,7 @@ export default class CandleTooltipView extends IndicatorTooltipView {
       const [leftIcons, middleIcons, rightIcons] = this.classifyTooltipIcons(tooltipStyles.icons)
       const [leftIconsNextStartX, leftIconsNextStartY, leftIconsLastRowHeight, leftIconsIncreaseHeight] = this.drawStandardTooltipIcons(
         ctx, bounding, { paneId, indicatorName: '', iconId: '' },
-        activeTooltipIconInfo, leftIcons, x, y, 0
+        activeTooltipIcon, leftIcons, x, y, 0
       )
       x = leftIconsNextStartX
       y = leftIconsNextStartY
@@ -150,7 +150,7 @@ export default class CandleTooltipView extends IndicatorTooltipView {
 
       const [middleIconsNextStartX, middleIconsNextStartY, middleIconsLastRowHeight, middleIconsIncreaseHeight] = this.drawStandardTooltipIcons(
         ctx, bounding, { paneId, indicatorName: '', iconId: '' },
-        activeTooltipIconInfo, middleIcons, x, y, prevRowHeight
+        activeTooltipIcon, middleIcons, x, y, prevRowHeight
       )
       x = middleIconsNextStartX
       y = middleIconsNextStartY
@@ -167,7 +167,7 @@ export default class CandleTooltipView extends IndicatorTooltipView {
 
       const [rightIconsNextStartX, rightIconsNextStartY, rightIconsLastRowHeight, rightIconsIncreaseHeight] = this.drawStandardTooltipIcons(
         ctx, bounding, { paneId, indicatorName: '', iconId: '' },
-        activeTooltipIconInfo, rightIcons, x, y, prevRowHeight
+        activeTooltipIcon, rightIcons, x, y, prevRowHeight
       )
       x = rightIconsNextStartX
       y = rightIconsNextStartY
@@ -423,58 +423,59 @@ export default class CandleTooltipView extends IndicatorTooltipView {
   ): TooltipData[] {
     const tooltipStyles = styles.tooltip
     const textColor = tooltipStyles.text.color
-    let tooltipData: TooltipData[] = []
-    if (isFunction(tooltipStyles.custom)) {
-      const labelValues = tooltipStyles.custom?.(data, styles) ?? []
-      labelValues.forEach(({ title, value }) => {
-        let t: TooltipDataChild = { text: '', color: '' }
-        if (isObject(title)) {
-          t = title as TooltipDataChild
-        } else {
-          t.text = title as string
-          t.color = textColor
-        }
-        t.text = i18n(t.text, locale)
-        let v: TooltipDataChild = { text: '', color: '' }
-        if (isObject(value)) {
-          v = value as TooltipDataChild
-        } else {
-          v.text = value as string
-          v.color = textColor
-        }
-        tooltipData.push({ title: t, value: v })
-      })
-    } else {
-      const { price: pricePrecision, volume: volumePrecision } = precision
-      const current = data.current
-      tooltipData = [
-        {
-          title: { text: i18n('time', locale), color: textColor },
-          value: { text: customApi.formatDate(dateTimeFormat, current.timestamp, 'YYYY-MM-DD HH:mm', FormatDateType.Tooltip), color: textColor }
-        }, {
-          title: { text: i18n('open', locale), color: textColor },
-          value: { text: formatThousands(formatPrecision(current.open, pricePrecision), thousandsSeparator), color: textColor }
-        }, {
-          title: { text: i18n('high', locale), color: textColor },
-          value: { text: formatThousands(formatPrecision(current.high, pricePrecision), thousandsSeparator), color: textColor }
-        }, {
-          title: { text: i18n('low', locale), color: textColor },
-          value: { text: formatThousands(formatPrecision(current.low, pricePrecision), thousandsSeparator), color: textColor }
-        }, {
-          title: { text: i18n('close', locale), color: textColor },
-          value: { text: formatThousands(formatPrecision(current.close, pricePrecision), thousandsSeparator), color: textColor }
-        }, {
-          title: { text: i18n('volume', locale), color: textColor },
-          value: {
-            text: formatThousands(
-              customApi.formatBigNumber(formatPrecision(current.volume ?? tooltipStyles.defaultValue, volumePrecision)),
-              thousandsSeparator
-            ),
-            color: textColor
-          }
-        }
-      ]
+    const current = data.current
+    const prevClose = data.prev?.close ?? current.close
+    const changeValue = current.close - prevClose
+    const { price: pricePrecision, volume: volumePrecision } = precision
+    const mapping = {
+      '{time}': customApi.formatDate(dateTimeFormat, current.timestamp, 'YYYY-MM-DD HH:mm', FormatDateType.Tooltip),
+      '{open}': formatThousands(formatPrecision(current.open, pricePrecision), thousandsSeparator),
+      '{high}': formatThousands(formatPrecision(current.high, pricePrecision), thousandsSeparator),
+      '{low}': formatThousands(formatPrecision(current.low, pricePrecision), thousandsSeparator),
+      '{close}': formatThousands(formatPrecision(current.close, pricePrecision), thousandsSeparator),
+      '{volume}': formatThousands(
+        customApi.formatBigNumber(formatPrecision(current.volume ?? tooltipStyles.defaultValue, volumePrecision)),
+        thousandsSeparator
+      ),
+      '{change}': prevClose === 0 ? tooltipStyles.defaultValue : `${formatPrecision(changeValue / prevClose * 100)}%`
     }
-    return tooltipData
+    const labelValues = (
+      isFunction(tooltipStyles.custom)
+        ? tooltipStyles.custom?.(data, styles)
+        : tooltipStyles.custom
+    ) ?? [
+      { title: 'time', value: '{time}' },
+      { title: 'open', value: '{open}' },
+      { title: 'high', value: '{high}' },
+      { title: 'low', value: '{low}' },
+      { title: 'close', value: '{close}' },
+      { title: 'volume', value: '{volume}' }
+    ]
+    return labelValues.map(({ title, value }) => {
+      let t: TooltipDataChild = { text: '', color: '' }
+      if (isObject(title)) {
+        t = { ...title }
+      } else {
+        t.text = title
+        t.color = textColor
+      }
+      t.text = i18n(t.text, locale)
+      let v: TooltipDataChild = { text: tooltipStyles.defaultValue, color: '' }
+      if (isObject(value)) {
+        v = { ...value }
+      } else {
+        v.text = value
+        v.color = textColor
+      }
+      const match = v.text.match(/{(\S*)}/)
+      if (match !== null && match.length > 1) {
+        const key = `{${match[1]}}`
+        v.text = v.text.replace(key, mapping[key] ?? tooltipStyles.defaultValue)
+        if (key === '{change}') {
+          v.color = changeValue === 0 ? styles.priceMark.last.noChangeColor : (changeValue > 0 ? styles.priceMark.last.upColor : styles.priceMark.last.downColor)
+        }
+      }
+      return { title: t, value: v }
+    })
   }
 }

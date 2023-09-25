@@ -94,7 +94,8 @@ import StyleExplain from '../../components/StyleExplain.vue'
           paddingBottom: 4,
           // 'solid' | 'dashed'
           borderStyle: 'solid',
-          borderSize: 1,
+          borderSize: 0,
+          borderColor: 'transparent',
           borderDashedValue: [2, 2],
           color: '#FFFFFF',
           family: 'Helvetica Neue',
@@ -108,9 +109,12 @@ import StyleExplain from '../../components/StyleExplain.vue'
       showRule: 'always',
       // 'standard' | 'rect'
       showType: 'standard',
-      // Display callback methods, and return an array of data format types when required
-      // The subitem type of the array is {title, value}
-      // Title and value can be strings or objects, and the object type is {text, color}
+      // Custom display, it can be a callback method or an array, when it is a method, it needs to return an array
+      // The child item type of the array is { title, value }
+      // title and value can be strings or objects, and the object type is { text, color }
+      // title or title.text can be an internationalized key,
+      // value or value.text supports string templates
+      // For example: want to display time, opening and closing, configure [{ title: 'time', value: '{time}' }, { title: 'open', value: '{open}' }, { title: ' close', value: '{close}' }]
       custom: null
       defaultValue: 'n/a',
       rect: {
@@ -298,8 +302,8 @@ import StyleExplain from '../../components/StyleExplain.vue'
       family: 'Helvetica Neue',
       weight: 'normal',
       size: 12,
-      marginStrat: 4,
-      marginBottom: 4
+      marginStart: 4,
+      marginEnd: 4
     },
     tickLine: {
       show: true,
@@ -328,8 +332,8 @@ import StyleExplain from '../../components/StyleExplain.vue'
       family: 'Helvetica Neue',
       weight: 'normal',
       size: 12,
-      marginStrat: 4,
-      marginBottom: 4
+      marginStart: 4,
+      marginEnd: 4
     },
     tickLine: {
       show: true,
@@ -467,10 +471,23 @@ import StyleExplain from '../../components/StyleExplain.vue'
       dashedValue: [2, 2]
     },
     text: {
-      color: '#1677FF',
+      // 'fill' | 'stroke' | 'stroke_fill'
+      style: 'fill',
+      color: '#FFFFFF',
       size: 12,
       family: 'Helvetica Neue',
-      weight: 'normal'
+      weight: 'normal',
+      // 'solid' | 'dashed'
+      borderStyle: 'solid',
+      borderDashedValue: [2, 2],
+      borderSize: 0,
+      borderRadius: 2,
+      borderColor: '#1677FF',
+      paddingLeft: 0,
+      paddingRight: 0,
+      paddingTop: 0,
+      paddingBottom: 0,
+      backgroundColor: 'transparent'
     },
     rectText: {
       // 'fill' | 'stroke' | 'stroke_fill'

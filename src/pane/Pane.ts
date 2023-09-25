@@ -17,6 +17,8 @@ import Nullable from '../common/Nullable'
 import Updater, { UpdateLevel } from '../common/Updater'
 import Bounding, { getDefaultBounding } from '../common/Bounding'
 
+import { merge } from '../common/utils/typeChecks'
+
 import Axis from '../component/Axis'
 
 import DrawWidget from '../widget/DrawWidget'
@@ -27,18 +29,23 @@ import Chart from '../Chart'
 
 import { createDom } from '../common/utils/dom'
 import { getPixelRatio } from '../common/utils/canvas'
-import { merge } from '../common/utils/typeChecks'
 
 export interface PaneGap {
   top?: number
   bottom?: number
 }
+
+export interface PaneAxisOptions {
+  scrollZoomEnabled?: boolean
+}
+
 export interface PaneOptions {
   id?: string
   height?: number
   minHeight?: number
   dragEnabled?: boolean
   gap?: PaneGap
+  axisOptions?: PaneAxisOptions
 }
 
 export const PANE_MIN_HEIGHT = 30
@@ -47,13 +54,13 @@ export const PANE_DEFAULT_HEIGHT = 100
 
 export const PaneIdConstants = {
   CANDLE: 'candle_pane',
-  INDICATOR: 'indcator_pane_',
+  INDICATOR: 'indicator_pane_',
   XAXIS: 'xaxis_pane'
 }
 
 export default abstract class Pane<C extends Axis = Axis> implements Updater {
   private _container: HTMLElement
-  private _seriesContiainer: HTMLElement
+  private _seriesContainer: HTMLElement
   private readonly _id: string
   private readonly _chart: Chart
   private _mainWidget: DrawWidget<C>
@@ -66,7 +73,7 @@ export default abstract class Pane<C extends Axis = Axis> implements Updater {
   private _topPane: Nullable<Pane>
   private _bottomPane: Nullable<Pane>
 
-  private readonly _options: DeepRequired<Omit<PaneOptions, 'id' | 'height'>> = { minHeight: PANE_MIN_HEIGHT, dragEnabled: true, gap: { top: 0.2, bottom: 0.1 } }
+  private readonly _options: DeepRequired<Omit<PaneOptions, 'id' | 'height'>> = { minHeight: PANE_MIN_HEIGHT, dragEnabled: true, gap: { top: 0.2, bottom: 0.1 }, axisOptions: { scrollZoomEnabled: true } }
 
   constructor (rootContainer: HTMLElement, chart: Chart, id: string, topPane?: Pane, bottomPane?: Pane) {
     this._chart = chart
@@ -78,7 +85,7 @@ export default abstract class Pane<C extends Axis = Axis> implements Updater {
 
   private _init (rootContainer: HTMLElement): void {
     this._container = rootContainer
-    this._seriesContiainer = createDom('div', {
+    this._seriesContainer = createDom('div', {
       width: '100%',
       margin: '0',
       padding: '0',
@@ -89,16 +96,16 @@ export default abstract class Pane<C extends Axis = Axis> implements Updater {
     this._separatorWidget = this.createSeparatorWidget(rootContainer)
     const lastElement = rootContainer.lastChild
     if (lastElement !== null) {
-      rootContainer.insertBefore(this._seriesContiainer, lastElement)
+      rootContainer.insertBefore(this._seriesContainer, lastElement)
     } else {
-      rootContainer.appendChild(this._seriesContiainer)
+      rootContainer.appendChild(this._seriesContainer)
     }
-    this._mainWidget = this.createMainWidget(this._seriesContiainer)
-    this._yAxisWidget = this.creatYAxisWidget(this._seriesContiainer)
+    this._mainWidget = this.createMainWidget(this._seriesContainer)
+    this._yAxisWidget = this.createYAxisWidget(this._seriesContainer)
   }
 
   getContainer (): HTMLElement {
-    return this._seriesContiainer
+    return this._seriesContainer
   }
 
   getId (): string {
@@ -107,6 +114,20 @@ export default abstract class Pane<C extends Axis = Axis> implements Updater {
 
   setOptions (options: Omit<PaneOptions, 'id' | 'height'>): Pane<C> {
     merge(this._options, options)
+    let container: HTMLElement
+    let cursor: string
+    if (this.getId() === PaneIdConstants.XAXIS) {
+      container = this.getMainWidget().getContainer()
+      cursor = 'ew-resize'
+    } else {
+      container = this.getYAxisWidget()?.getContainer() as HTMLElement
+      cursor = 'ns-resize'
+    }
+    if (options.axisOptions?.scrollZoomEnabled ?? true) {
+      container.style.cursor = cursor
+    } else {
+      container.style.cursor = 'default'
+    }
     return this
   }
 
@@ -179,12 +200,12 @@ export default abstract class Pane<C extends Axis = Axis> implements Updater {
   getSeparatorWidget (): Nullable<SeparatorWidget> { return this._separatorWidget }
 
   update (level?: UpdateLevel): void {
-    if (this._bounding.width !== this._seriesContiainer.offsetWidth) {
-      this._seriesContiainer.style.width = `${this._bounding.width}px`
+    if (this._bounding.width !== this._seriesContainer.offsetWidth) {
+      this._seriesContainer.style.width = `${this._bounding.width}px`
     }
     const seriesHeight = this._mainWidget.getBounding().height
-    if (seriesHeight !== this._seriesContiainer.offsetHeight) {
-      this._seriesContiainer.style.height = `${seriesHeight}px`
+    if (seriesHeight !== this._seriesContainer.offsetHeight) {
+      this._seriesContainer.style.height = `${seriesHeight}px`
     }
     const l = level ?? UpdateLevel.Drawer
     this._mainWidget.update(l)
@@ -234,7 +255,7 @@ export default abstract class Pane<C extends Axis = Axis> implements Updater {
   }
 
   destroy (): void {
-    this._container.removeChild(this._seriesContiainer)
+    this._container.removeChild(this._seriesContainer)
     if (this._separatorWidget !== null) {
       this._container.removeChild(this._separatorWidget.getContainer())
     }
@@ -246,7 +267,7 @@ export default abstract class Pane<C extends Axis = Axis> implements Updater {
 
   protected createSeparatorWidget (_container: HTMLElement): Nullable<SeparatorWidget> { return null }
 
-  protected creatYAxisWidget (_container: HTMLElement): Nullable<YAxisWidget> { return null }
+  protected createYAxisWidget (_container: HTMLElement): Nullable<YAxisWidget> { return null }
 
   protected abstract createMainWidget (container: HTMLElement): DrawWidget<C>
 }

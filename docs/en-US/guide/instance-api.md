@@ -6,17 +6,17 @@
 ```
 Get the dom container.
 - `paneId` window id, the default is the entire chart container
-- `position` options are 'root', 'main' and 'yAxis', default is 'root'
+- `position` supports `root`, `main`, `yAxis`, the default is `root`
 
 
 ## getSize(paneId, position)
 ```typescript
 (paneId?: string, position?: 'root' | 'main' | 'yAxis') => {
-   width: number,
-   height: number,
-   left: number,
-   top: number,
-   right: number,
+   width: number
+   height: number
+   left: number
+   top: number
+   right: number
    bottom: number
 }
 ```
@@ -134,7 +134,12 @@ Gets the width of a single candlestick on the chart.
 
 ## getVisibleRange()
 ```typescript
-() => { from: number, to: number, realFrom: number, realTo: number }
+() => {
+  from: number
+  to: number
+  realFrom: number
+  realTo: number
+}
 ```
 Get visible range.
 
@@ -142,17 +147,17 @@ Get visible range.
 ## applyNewData(dataList, more, callback)
 ```typescript
 (
-   dataList: Array<{
-     timestamp: number,
-     open: number,
-     close: number,
-     high: number,
-     low: number,
-     volume?: number,
-     turnover?: number
-   }>,
-   more?: boolean,
-   callback?: () => void
+  dataList: Array<{
+    timestamp: number
+    open: number
+    close: number
+    high: number
+    low: number
+    volume?: number
+    turnover?: number
+  }>,
+  more?: boolean,
+  callback?: () => void
 ) => void
 ```
 Add new data, this method will clear the chart data, no need to call the clearData method additionally.
@@ -164,17 +169,17 @@ Add new data, this method will clear the chart data, no need to call the clearDa
 ## applyMoreData(dataList, more, callback)
 ```typescript
 (
-   dataList: Array<{
-     timestamp: number,
-     open: number,
-     close: number,
-     high: number,
-     low: number,
-     volume?: number,
-     turnover?: number
-   }>,
-   more?: boolean,
-   callback?: () => void
+  dataList: Array<{
+    timestamp: number
+    open: number
+    close: number
+    high: number
+    low: number
+    volume?: number
+    turnover?: number
+  }>,
+  more?: boolean,
+  callback?: () => void
 ) => void
 ```
 Add more historical data.
@@ -187,12 +192,12 @@ Add more historical data.
 ```typescript
 (
   data: {
-    timestamp: number,
-    open: number,
-    close: number,
-    high: number,
-    low: number,
-    volume?: number,
+    timestamp: number
+    open: number
+    close: number
+    high: number
+    low: number
+    volume?: number
     turnover?: number
   },
   callback?: () => void
@@ -206,13 +211,13 @@ Update data. Currently, only the timestamp of the last piece of data will be mat
 ## getDataList()
 ```typescript
 () => Array<{
-   timestamp: number,
-   open: number,
-   close: number,
-   high: number,
-   low: number,
-   volume?: number,
-   turnover?: number
+  timestamp: number
+  open: number
+  close: number
+  high: number
+  low: number
+  volume?: number
+  turnover?: number
 }>
 ```
 Get the current data source of the chart. For the returned data type, please refer to [data](./datasource.md).
@@ -235,77 +240,94 @@ Set load more callback function.
 ## createIndicator(value, isStack, paneOptions, callback)
 ```typescript
 (
-   value: string | {
-   name: string,
-     shortName?: string,
-     precision?: number,
-     calcParams?: any[],
-     shouldOhlc?: boolean,
-     shouldFormatBigNumber?: boolean,
-     visible?: boolean,
-     extendData?: any,
-     series?: 'normal' | 'price' | 'volume',
-     figures?: Array<{
-       key: string,
-       title?: string,
-       type?: string,
-       baseValue?: number,
+  value: string | {
+    name: string
+    shortName?: string
+    precision?: number
+    calcParams?: any[]
+    shouldOhlc?: boolean
+    shouldFormatBigNumber?: boolean
+    visible?: boolean
+    extendData?: any
+    series?: 'normal' | 'price' | 'volume'
+    figures?: Array<{
+       key: string
+       title?: string
+       type?: string
+       baseValue?: number
        styles?: (
          data: object,
          indicator: object,
          defaultStyles: object
-       ) => { style?: 'solid' | 'dashed' | 'stroke' | 'fill' | 'stroke_fill', color?: string }
-     }>
-     minValue?: number,
-     maxValue?: number,
-     styles?: object,
-     calc?: (dataList: KLineData[], indicator: object) => Promise<object[]> | object[],
-     regenerateFigures?: (calcParms: any[]) => Array<{
-       key: string,
-       title?: string,
-       type?: string,
-       baseValue?: number,
-       styles?: (
-         data: object,
-         indicator: object,
-         defaultStyles: object
-       ) => { style?: 'solid' | 'dashed' | 'stroke' | 'fill' | 'stroke_fill', color?: string }
-     }>,
-     createTooltipDataSource?: (params: object) => {
-       name?: string,
-       calcParamsText?: string,
-       values?: Array<{
-         title: string | { text: string, color: string },
-         value: string | { text: string, color: string }
-       }>
-     },
-     draw?: (params: object) => boolean
-   },
-   isStack?: boolean,
-   paneOptions?: {
-     id?: string,
-     height?: number,
-     minHeight?: number,
-     dragEnabled?: boolean
-     gap?: {
-       top?: number,
-       bottom?: number
-     }
-   } | null,
-   callback?: () => void
+       ) => ({
+        style?: 'solid' | 'dashed' | 'stroke' | 'fill' | 'stroke_fill'
+        color?: string
+      })
+    }>
+    minValue?: number
+    maxValue?: number
+    styles?: object
+    calc?: (dataList: KLineData[], indicator: object) => Promise<object[]> | object[]
+    regenerateFigures?: (calcParms: any[]) => Array<{
+      key: string
+      title?: string
+      type?: string
+      baseValue?: number
+      styles?: (
+        data: object,
+        indicator: object,
+        defaultStyles: object
+      ) => ({
+        style?: 'solid' | 'dashed' | 'stroke' | 'fill' | 'stroke_fill'
+        color?: string
+      })
+    }>
+    createTooltipDataSource?: (params: object) => ({
+      name?: string
+      calcParamsText?: string
+      values?: Array<{
+        title: string | {
+          text: string
+          color: string
+        }
+        value: string | {
+          text: string
+          color: string
+        }
+      }>
+    })
+    draw?: (params: object) => boolean
+  },
+  isStack?: boolean,
+  paneOptions?: {
+    id?: string
+    height?: number
+    minHeight?: number
+    dragEnabled?: boolean
+    gap?: {
+      top?: number
+      bottom?: number
+    }
+    axisOptions?: {
+      scrollZoomEnabled?: boolean
+    }
+  } | null,
+  callback?: () => void
 ) => string | null
 ```
 Create a technical indicator, the return value is a string that identifies the window, which is very important, and this identification is required for some subsequent operations on the window.
 - `value` technical indicator name or technical indicator object, when it is an object, the type is consistent with the input parameter of the chart method `overrideIndicator`
 - `isStack` is overrides
 - `paneOptions` window configuration information, can be default
-    - `id` window id, can be default
-    - `height` window height, can be default
-    - `minHeight` minimum height of the window, can be defaulted
-    - `dragEnbaled` Whether the window can be dragged to adjust the height, it can be defaulted
-    - `gap` margins
-      - `top` top margin, value less than 1 is a percentage
-      - `bottom` bottom margin, value less than 1 is a percentage
+  - `id` window id, can be default
+  - `height` window height, can be default
+  - `minHeight` minimum height of the window, can be defaulted
+  - `dragEnbaled` Whether the window can be dragged to adjust the height, it can be defaulted
+  - `gap` margins
+    - `top` top margin, value less than 1 is a percentage
+    - `bottom` bottom margin, value less than 1 is a percentage
+  - `axisOptions`
+    - `scrollZoomEnabled` Scroll zoom flag
 - `callback` success callback
 ::: tip Special id
 'candle_pane', the window id of the main picture.
@@ -313,66 +335,73 @@ Create a technical indicator, the return value is a string that identifies the w
 
 Example:
 ```javascript
-chart.createTechnicalIndicator('MA', false, {
-   id: 'pane_1',
-   height: 100,
-   minHeight: 30,
-   dragEnabled: true,
-   gap: { top: 0.2, bottom: 0.1 }
+chart.createIndicator('MA', false, {
+  id: 'pane_1',
+  height: 100,
+  minHeight: 30,
+  dragEnabled: true,
+  gap: { top: 0.2, bottom: 0.1 },
+  axisOptions: { scrollZoomEnabled: true }
 }, () => {})
 ```
 
 ## overrideIndicator(override, paneId, callback)
 ```typescript
 (
-   override: {
-     name: string,
-     shortName?: string,
-     precision?: number,
-     calcParams?: any[],
-     shouldOhlc?: boolean,
-     shouldFormatBigNumber?: boolean,
-     visible?: boolean,
-     extendData?: any,
-     series?: 'normal' | 'price' | 'volume',
-     figures?: Array<{
-       key: string,
-       title?: string,
-       type?: string,
-       baseValue?: number,
-       styles?: (
-         data: object,
-         indicator: object,
-         defaultStyles: object
-       ) => { style?: 'solid' | 'dashed' | 'stroke' | 'fill' | 'stroke_fill', color?: string }
-     }>
-     minValue?: number,
-     maxValue?: number,
-     styles?: object,
-     calc?: (dataList: KLineData[], indicator: object) => Promise<object[]> | object[],
-     regenerateFigures?: (calcParms: any[]) => Array<{
-       key: string,
-       title?: string,
-       type?: string,
-       baseValue?: number,
-       styles?: (
-         data: object,
-         indicator: object,
-         defaultStyles: object
-       ) => { style?: 'solid' | 'dashed' | 'stroke' | 'fill' | 'stroke_fill', color?: string }
-     }>,
-     createTooltipDataSource?: (params: object) => {
-       name?: string,
-       calcParamsText?: string,
-       values?: Array<{
-         title: string | { text: string, color: string },
-         value: string | { text: string, color: string }
-       }>
-     },
-     draw?: (params: object) => boolean
-   },
-   paneId?: string | null,
-   callback?: () => void
+  override: {
+    name: string
+    shortName?: string
+    precision?: number
+    calcParams?: any[]
+    shouldOhlc?: boolean
+    shouldFormatBigNumber?: boolean
+    visible?: boolean
+    extendData?: any
+    series?: 'normal' | 'price' | 'volume'
+    figures?: Array<{
+      key: string
+      title?: string
+      type?: string
+      baseValue?: number
+      styles?: (
+        data: object,
+        indicator: object,
+        defaultStyles: object
+      ) => ({
+        style?: 'solid' | 'dashed' | 'stroke' | 'fill' | 'stroke_fill'
+        color?: string
+      })
+    }>
+    minValue?: number
+    maxValue?: number
+    styles?: object
+    calc?: (dataList: KLineData[], indicator: object) => Promise<object[]> | object[]
+    regenerateFigures?: (calcParms: any[]) => Array<{
+      key: string
+      title?: string
+      type?: string
+      baseValue?: number
+      styles?: (
+        data: object,
+        indicator: object,
+        defaultStyles: object
+      ) => ({
+        style?: 'solid' | 'dashed' | 'stroke' | 'fill' | 'stroke_fill'
+        color?: string
+      })
+    }>
+    createTooltipDataSource?: (params: object) => {
+      name?: string
+      calcParamsText?: string
+      values?: Array<{
+        title: string | { text: string, color: string }
+        value: string | { text: string, color: string }
+      }>
+    }
+    draw?: (params: object) => boolean
+  },
+  paneId?: string | null,
+  callback?: () => void
 ) => void
 ```
 Overlay technical indicator information.
@@ -473,34 +502,74 @@ Remove technical indicators.
 ## createOverlay(value, paneId)
 ```typescript
 (
-   value: string | {
-     name: string,
-     id?: string,
-     groupId?: string,
-     lock?: boolean,
-     visible?: boolean,
-     needDefaultPointFigure?: boolean,
-     needDefaultXAxisFigure?: boolean,
-     needDefaultYAxisFigure?: boolean,
-     mode?: 'normal' | 'weak_magnet' | 'strong_magnet',
-     points?: Array<{ timestamp?: number, dataIndex?: number, value?: number }>,
-     extendData?: any,
-     styles?: object,
-     onDrawStart?: (event: object) => boolean,
-     onDrawing?: (event: object) => boolean,
-     onDrawEnd?: (event: object) => boolean,
-     onClick?: (event: object) => boolean,
-     onRightClick?: (event: object) => boolean,
-     onPressedMoveStart?: (event: object) => boolean,
-     onPressedMoving?: (event: object) => boolean,
-     onPressedMoveEnd?: (event: object) => boolean,
-     onMouseEnter?: (event: object) => boolean,
-     onMouseLeave?: (event: object) => boolean,
-     onRemoved?: (event: object) => boolean,
-     onSelected?: (event: object) => boolean,
-     onDeselected?: (event: object) => boolean
-   },
-   paneId?: string
+  value: string | {
+    name: string
+    id?: string
+    groupId?: string
+    lock?: boolean
+    visible?: boolean
+    zLevel?: number
+    needDefaultPointFigure?: boolean
+    needDefaultXAxisFigure?: boolean
+    needDefaultYAxisFigure?: boolean
+    mode?: 'normal' | 'weak_magnet' | 'strong_magnet'
+    modeSensitivity?: number
+    points?: Array<{
+      timestamp?: number
+      dataIndex?: number
+      value?: number
+    }>
+    extendData?: any
+    styles?: object
+    onDrawStart?: (event: object) => boolean
+    onDrawing?: (event: object) => boolean
+    onDrawEnd?: (event: object) => boolean
+    onClick?: (event: object) => boolean
+    onDoubleClick?: (event: object) => boolean
+    onRightClick?: (event: object) => boolean
+    onPressedMoveStart?: (event: object) => boolean
+    onPressedMoving?: (event: object) => boolean
+    onPressedMoveEnd?: (event: object) => boolean
+    onMouseEnter?: (event: object) => boolean
+    onMouseLeave?: (event: object) => boolean
+    onRemoved?: (event: object) => boolean
+    onSelected?: (event: object) => boolean
+    onDeselected?: (event: object) => boolean
+  } | Array<string | {
+    name: string
+    id?: string
+    groupId?: string
+    lock?: boolean
+    visible?: boolean
+    zLevel?: number
+    needDefaultPointFigure?: boolean
+    needDefaultXAxisFigure?: boolean
+    needDefaultYAxisFigure?: boolean
+    mode?: 'normal' | 'weak_magnet' | 'strong_magnet'
+    modeSensitivity?: number
+    points?: Array<{
+      timestamp?: number
+      dataIndex?: number
+      value?: number
+    }>
+    extendData?: any
+    styles?: object
+    onDrawStart?: (event: object) => boolean
+    onDrawing?: (event: object) => boolean
+    onDrawEnd?: (event: object) => boolean
+    onClick?: (event: object) => boolean
+    onDoubleClick?: (event: object) => boolean
+    onRightClick?: (event: object) => boolean
+    onPressedMoveStart?: (event: object) => boolean
+    onPressedMoving?: (event: object) => boolean
+    onPressedMoveEnd?: (event: object) => boolean
+    onMouseEnter?: (event: object) => boolean
+    onMouseLeave?: (event: object) => boolean
+    onRemoved?: (event: object) => boolean
+    onSelected?: (event: object) => boolean
+    onDeselected?: (event: object) => boolean
+  }>,
+  paneId?: string
 ) => string | null
 ```
 Creates an overlay, returning an identifier of type String.
@@ -530,7 +599,9 @@ chart.createOverlay({
    },
    lock: false,
    visible: true,
+   zLevel: 0,
    mode: 'weak_magnet',
+   modeSensitivity: 8,
    extendData: 'xxxxxxxx',
    needDefaultPointFigure: false,
    needDefaultXAxisFigure: false,
@@ -539,6 +610,7 @@ chart.createOverlay({
    onDrawing: function (event) { console. log(event) },
    onDrawEnd: function (event) { console. log(event) },
    onClick: function (event) { console. log(event) },
+   onDoubleClick: function (event) { console. log(event) },
    onRightClick: function (event) {
      console. log(event)
      return false
@@ -566,61 +638,71 @@ Get overlay information by id.
 ```typescript
 (
   override: {
-    name: string,
-    id?: string,
-    groupId?: string,
-    lock?: boolean,
-    visible?: boolean,
-    needDefaultPointFigure?: boolean,
-    needDefaultXAxisFigure?: boolean,
-    needDefaultYAxisFigure?: boolean,
-    mode?: 'normal' | 'weak_magnet' | 'strong_magnet',
-    points?: Array<{ timestamp?: number, dataIndex?: number, value?: number }>,
-    extendData?: any,
-    styles?: object,
-    onDrawStart?: (event: object) => boolean,
-    onDrawing?: (event: object) => boolean,
-    onDrawEnd?: (event: object) => boolean,
-    onClick?: (event: object) => boolean,
-    onRightClick?: (event: object) => boolean,
-    onPressedMoveStart?: (event: object) => boolean,
-    onPressedMoving?: (event: object) => boolean,
-    onPressedMoveEnd?: (event: object) => boolean,
-    onMouseEnter?: (event: object) => boolean,
-    onMouseLeave?: (event: object) => boolean,
-    onRemoved?: (event: object) => boolean,
-    onSelected?: (event: object) => boolean,
+    name: string
+    id?: string
+    groupId?: string
+    lock?: boolean
+    visible?: boolean
+    zLevel?: number
+    needDefaultPointFigure?: boolean
+    needDefaultXAxisFigure?: boolean
+    needDefaultYAxisFigure?: boolean
+    mode?: 'normal' | 'weak_magnet' | 'strong_magnet'
+    modeSensitivity?: number
+    points?: Array<{
+      timestamp?: number
+      dataIndex?: number
+      value?: number
+    }>
+    extendData?: any
+    styles?: object
+    onDrawStart?: (event: object) => boolean
+    onDrawing?: (event: object) => boolean
+    onDrawEnd?: (event: object) => boolean
+    onClick?: (event: object) => boolean
+    onDoubleClick?: (event: object) => boolean
+    onRightClick?: (event: object) => boolean
+    onPressedMoveStart?: (event: object) => boolean
+    onPressedMoving?: (event: object) => boolean
+    onPressedMoveEnd?: (event: object) => boolean
+    onMouseEnter?: (event: object) => boolean
+    onMouseLeave?: (event: object) => boolean
+    onRemoved?: (event: object) => boolean
+    onSelected?: (event: object) => boolean
     onDeselected?: (event: object) => boolean
   }
 ) => string | null
 ```
 Overlays that have been drawn.
 - `override` parameters that need to be overridden
-   - `name` overlay name, unique identifier for creation
-   - `id` Overlay identification, if the id exists, it will be based on the id to overwrite
-   - `groupId` Group id
-   - `lock` is locked to prevent dragging
-   - `visible` visible or not
-   - `needDefaultPointFigure` needs a default point figure
-   - `needDefaultXAxisFigure` needs the default x-axis figure
-   - `needDefaultYAxisFigure` needs the default y-axis figure
-   - `mode` mode, options are 'normal', 'weak_magnet' and 'strong_magnet'
-   - `points` point information
-   - `extendData` extended data
-   - `styles` styles
-   - `onDrawStart` start drawing event
-   - `onDrawing` drawing event
-   - `onDrawEnd` draw end event
-   - `onClick` click event
-   - `onRightClick` right click event
-   - `onPressedMoveStart` press start move event
-   - `onPressedMoving` Press and move event
-   - `onPressedMoveEnd` Press and move end event
-   - `onMouseEnter` mouse enter event
-   - `onMouseLeave` mouse out event
-   - `onRemoved` delete event
-   - `onSelected` selected event
-   - `onDeselected` deselected event
+  - `name` overlay name, unique identifier for creation
+  - `id` Overlay identification, if the id exists, it will be based on the id to overwrite
+  - `groupId` Group id
+  - `lock` is locked to prevent dragging
+  - `visible` visible or not
+  - `zLevel` Draw level
+  - `needDefaultPointFigure` needs a default point figure
+  - `needDefaultXAxisFigure` needs the default x-axis figure
+  - `needDefaultYAxisFigure` needs the default y-axis figure
+  - `mode` mode, options are 'normal', 'weak_magnet' and 'strong_magnet'
+  - `modeSensitivity` mode sensitivity, only valid when mode is weak_magnet
+  - `points` point information
+  - `extendData` extended data
+  - `styles` styles
+  - `onDrawStart` start drawing event
+  - `onDrawing` drawing event
+  - `onDrawEnd` draw end event
+  - `onClick` click event
+  - `onDoubleClick` double click event
+  - `onRightClick` right click event
+  - `onPressedMoveStart` press start move event
+  - `onPressedMoving` Press and move event
+  - `onPressedMoveEnd` Press and move end event
+  - `onMouseEnter` mouse enter event
+  - `onMouseLeave` mouse out event
+  - `onRemoved` delete event
+  - `onSelected` selected event
+  - `onDeselected` deselected event
 
 Example:
 ```javascript
@@ -642,7 +724,9 @@ chart.overrideOverlay({
    },
    lock: false,
    visible: true,
+   zLevel: 0,
    mode: 'weak_magnet',
+   modeSensitivity: 8
    extendData: 'xxxxxxxx',
    needDefaultPointFigure: false,
    needDefaultXAxisFigure: false,
@@ -651,6 +735,7 @@ chart.overrideOverlay({
    onDrawing: function (event) { console. log(event) },
    onDrawEnd: function (event) { console. log(event) },
    onClick: function (event) { console. log(event) },
+   onDoubleClick: function (event) { console. log(event) },
    onRightClick: function (event) {
      console. log(event)
      return false
@@ -670,8 +755,8 @@ chart.overrideOverlay({
 ```typescript
 (
   remove: string | {
-    id?: string,
-    groupId?: string,
+    id?: string
+    groupId?: string
     name?: string
   }
 ) => void
@@ -718,7 +803,14 @@ Scroll to the specified timestamp.
 
 ## zoomAtCoordinate(scale, coordinate, animationDuration)
 ```typescript
-(scale: number, coordinate?: { x: number, y: number }, animationDuration?: number) => void
+(
+  scale: number,
+  coordinate?: {
+    x: number
+    y: number
+  },
+  animationDuration?: number
+) => void
 ```
 Scale at a certain coordinate point.
 - `scale` scaling factor
@@ -748,26 +840,33 @@ Scale on the specified timestamp.
 
 ## setPaneOptions(options)
 ```typescript
-(options: {
-   id: string,
-   height?: number,
-   minHeight?: number,
-   dragEnabled?: boolean
-   gap?: {
-     top?: number,
-     bottom?: number
-   }
-}) => void
+(
+  options: {
+    id: string
+    height?: number
+    minHeight?: number
+    dragEnabled?: boolean
+    gap?: {
+      top?: number
+      bottom?: number
+    }
+    axisOptions?: {
+      scrollZoomEnabled?: boolean
+    }
+  }
+) => void
 ```
 Set window configuration.
 - `paneOptions` window configuration information, can be default
-    - `id` window id
-    - `height` window height, can be default
-    - `minHeight` minimum height of the window, can be defaulted
-    - `dragEnbaled` Whether the window can be dragged to adjust the height, it can be defaulted
-    - `gap` margins
-      - `top` top margin, value less than 1 is a percentage
-      - `bottom` bottom margin, value less than 1 is a percentage
+  - `id` window id
+  - `height` window height, can be default
+  - `minHeight` minimum height of the window, can be defaulted
+  - `dragEnbaled` Whether the window can be dragged to adjust the height, it can be defaulted
+  - `gap` margins
+    - `top` top margin, value less than 1 is a percentage
+    - `bottom` bottom margin, value less than 1 is a percentage
+  - `axisOptions`
+    - `scrollZoomEnabled` Scroll zoom flag
 ::: tip Special id
 'candle_pane', the window id of the main picture.
 :::
@@ -775,11 +874,12 @@ Set window configuration.
 Example:
 ```javascript
 chart.setPaneOptions({
-   id: 'pane_1',
-   height: 100,
-   minHeight: 3,
-   dragEnabled: true,
-   gap: { top: 0.2, bottom: 0.1 }
+  id: 'pane_1',
+  height: 100,
+  minHeight: 3,
+  dragEnabled: true,
+  gap: { top: 0.2, bottom: 0.1 },
+  axisOptions: { scrollZoomEnabled: true }
 })
 ```
 
@@ -823,12 +923,12 @@ Unsubscribe from chart actions.
 ```typescript
 (
    value: {
-     dataIndex?: number,
-     timestamp?: number,
+     dataIndex?: number
+     timestamp?: number
      value?: number
    } | Array<{
-     dataIndex?: number,
-     timestamp?: number,
+     dataIndex?: number
+     timestamp?: number
      value?: number
    }>,
    finder: {
@@ -850,20 +950,26 @@ Convert values to coordinates.
 ## convertFromPixel(coordinate, finder)
 ```typescript
 (
-   coordinate: { x: number?, y?: number } | Array<{ x?: number, y?: number },
-   finder: {
-     paneId?: string,
-     absolute?: boolean
-   }
+  coordinate: {
+    x?: number
+    y?: number
+  } | Array<{
+    x?: number
+    y?: number
+  },
+  finder: {
+    paneId?: string
+    absolute?: boolean
+  }
 ) => {
-     dataIndex?: number,
-     timestamp?: number,
-     value?: number
-   } | Array<{
-     dataIndex?: number,
-     timestamp?: number,
-     value?: number
-   }>
+    dataIndex?: number
+    timestamp?: number
+    value?: number
+  } | Array<{
+    dataIndex?: number
+    timestamp?: number
+    value?: number
+  }>
 ```
 Convert coordinates to values.
 - `coordinate` needs to be converted, it can be an object or an array

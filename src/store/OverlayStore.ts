@@ -18,13 +18,14 @@ import { MouseTouchEvent } from '../common/SyntheticEvent'
 
 import { createId } from '../common/utils/id'
 
-import OverlayImp, { OVERLAY_ID_PREFIX, OverlayConstructor, OverlayCreate, OverlayRemove } from '../component/Overlay'
+import OverlayImp, { OVERLAY_ID_PREFIX, OVERLAY_ACTIVE_Z_LEVEL, OverlayCreate, OverlayRemove } from '../component/Overlay'
 
-import { getOverlayClass } from '../extension/overlay/index'
+import { getOverlayInnerClass } from '../extension/overlay/index'
 
 import ChartStore from './ChartStore'
 
 import { PaneIdConstants } from '../pane/Pane'
+import { isFunction } from '../common/utils/typeChecks'
 
 export interface ProgressOverlayInfo {
   paneId: string
@@ -49,6 +50,8 @@ export default class OverlayStore {
   private readonly _chartStore: ChartStore
 
   private _instances = new Map<string, OverlayImp[]>()
+
+  private readonly _counter = new Map<string, number>()
 
   /**
    * Overlay information in painting
@@ -95,16 +98,18 @@ export default class OverlayStore {
     this._chartStore = chartStore
   }
 
-  private _overrideInstance (instance: OverlayImp, overlay: Partial<OverlayCreate>): boolean {
+  private _overrideInstance (instance: OverlayImp, overlay: Partial<OverlayCreate>): [boolean, boolean] {
     const {
-      id, groupId, points, styles, lock, visible, mode, extendData,
+      id, groupId, points, styles, lock, visible,
+      zLevel, mode, modeSensitivity, extendData,
       onDrawStart, onDrawing,
-      onDrawEnd, onClick, onRightClick,
+      onDrawEnd, onClick, onDoubleClick, onRightClick,
       onPressedMoveStart, onPressedMoving, onPressedMoveEnd,
       onMouseEnter, onMouseLeave,
       onRemoved, onSelected, onDeselected
     } = overlay
     let updateFlag = false
+    let sortFlag = false
     if (id !== undefined) {
       instance.setId(id)
     }
@@ -123,8 +128,15 @@ export default class OverlayStore {
     if (visible !== undefined && instance.setVisible(visible)) {
       updateFlag = true
     }
+    if (zLevel !== undefined && instance.setZLevel(zLevel)) {
+      updateFlag = true
+      sortFlag = true
+    }
     if (mode !== undefined) {
       instance.setMode(mode)
+    }
+    if (modeSensitivity !== undefined) {
+      instance.setModeSensitivity(modeSensitivity)
     }
     if (extendData !== undefined && instance.setExtendData(extendData)) {
       updateFlag = true
@@ -140,6 +152,9 @@ export default class OverlayStore {
     }
     if (onClick !== undefined) {
       instance.setOnClickCallback(onClick)
+    }
+    if (onDoubleClick !== undefined) {
+      instance.setOnDoubleClickCallback(onDoubleClick)
     }
     if (onRightClick !== undefined) {
       instance.setOnRightClickCallback(onRightClick)
@@ -168,7 +183,7 @@ export default class OverlayStore {
     if (onDeselected !== undefined) {
       instance.setOnDeselectedCallback(onDeselected)
     }
-    return updateFlag
+    return [updateFlag, sortFlag]
   }
 
   getInstanceById (id: string): Nullable<OverlayImp> {
@@ -187,28 +202,52 @@ export default class OverlayStore {
     return null
   }
 
-  addInstance (overlay: OverlayCreate, paneId: string, appointPaneFlag: boolean): Nullable<string> {
-    const id = overlay.id ?? createId(OVERLAY_ID_PREFIX)
-    if (this.getInstanceById(id) === null) {
-      const OverlayClazz = getOverlayClass(overlay.name) as OverlayConstructor
-      const instance = new OverlayClazz()
-      const groupId = overlay.groupId ?? id
-      overlay.id = id
-      overlay.groupId = groupId
-      this._overrideInstance(instance, overlay)
-      if (instance.isDrawing()) {
-        this._progressInstanceInfo = { paneId, instance, appointPaneFlag }
-      } else {
-        if (!this._instances.has(paneId)) {
-          this._instances.set(paneId, [])
-        }
-        this._instances.get(paneId)?.push(instance)
-      }
-      instance.onDrawStart?.(({ overlay: instance }))
-      this._chartStore.getChart().updatePane(UpdateLevel.Overlay, paneId)
-      return id
+  private _sort (paneId?: string): void {
+    if (paneId !== undefined) {
+      this._instances.get(paneId)?.sort((o1, o2) => o1.defaultZLevel - o2.defaultZLevel).sort((o1, o2) => o1.zLevel - o2.zLevel)
+    } else {
+      this._instances.forEach(paneInstances => {
+        paneInstances.sort((o1, o2) => o1.defaultZLevel - o2.defaultZLevel).sort((o1, o2) => o1.zLevel - o2.zLevel)
+      })
     }
-    return null
+  }
+
+  addInstances (overlays: OverlayCreate[], paneId: string, appointPaneFlag: boolean): Array<Nullable<string>> {
+    const ids = overlays.map(overlay => {
+      const id = overlay.id ?? createId(OVERLAY_ID_PREFIX)
+      if (this.getInstanceById(id) === null) {
+        const OverlayClazz = getOverlayInnerClass(overlay.name)
+        if (OverlayClazz !== null) {
+          const instance = new OverlayClazz()
+          const count = (this._counter.get(paneId) ?? 0) + 1
+          this._counter.set(paneId, count)
+          instance.setDefaultZLevel(count)
+          instance.setPaneId(paneId)
+          const groupId = overlay.groupId ?? id
+          overlay.id = id
+          overlay.groupId = groupId
+          this._overrideInstance(instance, overlay)
+          if (instance.isDrawing()) {
+            this._progressInstanceInfo = { paneId, instance, appointPaneFlag }
+          } else {
+            if (!this._instances.has(paneId)) {
+              this._instances.set(paneId, [])
+            }
+            this._instances.get(paneId)?.push(instance)
+          }
+          if (instance.isStart()) {
+            instance.onDrawStart?.(({ overlay: instance }))
+          }
+          return id
+        }
+      }
+      return null
+    })
+    if (ids.some(id => id !== null)) {
+      this._sort()
+      this._chartStore.getChart().updatePane(UpdateLevel.Overlay, paneId)
+    }
+    return ids
   }
 
   getProgressInstanceInfo (): Nullable<ProgressOverlayInfo> {
@@ -223,6 +262,7 @@ export default class OverlayStore {
           this._instances.set(paneId, [])
         }
         this._instances.get(paneId)?.push(instance)
+        this._sort(paneId)
         this._progressInstanceInfo = null
       }
     }
@@ -234,6 +274,7 @@ export default class OverlayStore {
         this._progressInstanceInfo.appointPaneFlag = appointPaneFlag
       }
       this._progressInstanceInfo.paneId = paneId
+      this._progressInstanceInfo.instance.setPaneId(paneId)
     }
   }
 
@@ -251,35 +292,48 @@ export default class OverlayStore {
   override (overlay: Partial<OverlayCreate>): void {
     const { id, groupId, name } = overlay
     let updateFlag = false
+    let sortFlag = false
+
+    const setFlag: (instance: OverlayImp) => void = (instance: OverlayImp) => {
+      const flags = this._overrideInstance(instance, overlay)
+      if (flags[0]) {
+        updateFlag = true
+      }
+      if (flags[1]) {
+        sortFlag = true
+      }
+    }
+
     if (id !== undefined) {
       const instance = this.getInstanceById(id)
-      if (instance !== null && this._overrideInstance(instance, overlay)) {
-        updateFlag = true
+      if (instance !== null) {
+        setFlag(instance)
       }
     } else {
       this._instances.forEach(paneInstances => {
         paneInstances.forEach(instance => {
           if (
-            ((name !== undefined && instance.name === name) ||
-              (groupId !== undefined && instance.groupId === groupId) ||
-              (name === undefined && groupId === undefined)) &&
-            this._overrideInstance(instance, overlay)
+            (name !== undefined && instance.name === name) ||
+            (groupId !== undefined && instance.groupId === groupId) ||
+            (name === undefined && groupId === undefined)
           ) {
-            updateFlag = true
+            setFlag(instance)
           }
         })
       })
       if (this._progressInstanceInfo !== null) {
         const progressInstance = this._progressInstanceInfo.instance
         if (
-          ((name !== undefined && progressInstance.name === name) ||
+          (name !== undefined && progressInstance.name === name) ||
           (groupId !== undefined && progressInstance.groupId === groupId) ||
-          (name === undefined && groupId === undefined)) &&
-           this._overrideInstance(progressInstance, overlay)
+          (name === undefined && groupId === undefined)
         ) {
-          updateFlag = true
+          setFlag(progressInstance)
         }
       }
+    }
+    if (sortFlag) {
+      this._sort()
     }
     if (updateFlag) {
       this._chartStore.getChart().updatePane(UpdateLevel.Overlay)
@@ -374,8 +428,31 @@ export default class OverlayStore {
     ) {
       this._hoverInstanceInfo = info
       if (instance?.id !== info.instance?.id) {
-        instance?.onMouseLeave?.({ overlay: instance, figureKey, figureIndex, ...event })
-        info.instance?.onMouseEnter?.({ overlay: info.instance, figureKey: info.figureKey, figureIndex: info.figureIndex, ...event })
+        let ignoreUpdateFlag = false
+        let sortFlag = false
+        if (instance !== null) {
+          sortFlag = true
+          instance.resetZLevel()
+          if (isFunction(instance.onMouseLeave)) {
+            instance.onMouseLeave({ overlay: instance, figureKey, figureIndex, ...event })
+            ignoreUpdateFlag = true
+          }
+        }
+
+        if (info.instance !== null) {
+          sortFlag = true
+          info.instance.setZLevel(OVERLAY_ACTIVE_Z_LEVEL)
+          if (isFunction(info.instance.onMouseEnter)) {
+            info.instance.onMouseEnter({ overlay: info.instance, figureKey: info.figureKey, figureIndex: info.figureIndex, ...event })
+            ignoreUpdateFlag = true
+          }
+        }
+        if (sortFlag) {
+          this._sort()
+        }
+        if (!ignoreUpdateFlag) {
+          this._chartStore.getChart().updatePane(UpdateLevel.Overlay)
+        }
       }
     }
   }

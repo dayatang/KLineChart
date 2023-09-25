@@ -1,5 +1,62 @@
 # 📠 更新日志
 
+## 9.5.4
+`2023-09-22`
++ 🐞 修复样式`candle.type`是`area`时，最新价线不显示问题。
++ 🐞 修复样式`crosshair.vertical.text.paddingLeft`显示不对问题。
+
+## 9.5.3
+`2023-09-19`
++ 🐞 修复ts下引入问题。
+
+## 9.5.2
+`2023-09-18`
++ 💄 优化基础图形`text`。
++ 💄 优化内置覆盖物`simpleAnnotation`和`simpleTag`。
++ 💄 优化技术指标自由样式，支持增量。
++ 🐞 修复typescript声明问题。
+
+## 9.5.1
+`2023-08-14`
++ 🆕 图表方法新增`getOverlayClass`。
++ 🆕 样式配置`candle.tooltip.custom`新增内置涨跌幅支持。
++ 💄 优化基础图形`rect`事件响应。
++ ↩️ 分割线事件响应回退
+
+
+## 9.5.0
+`2023-06-15`
++ 🆕 `Overlay`新增事件`onDoubleClick`，新增属性`modeSensitivity`。
++ 🆕 样式配置`candle.tooltip.custom`支持字符串模版。
++ 🐞 优化移动端阻尼滚动掉帧问题。
++ 🐞 修复窗口id命名拼写错误。
++ 💄 优化分割线事件响应灵敏度。
++ 💄 优化typescript下，OverlayFigure中的attrs类型声明。
+
+
+## 9.4.0
+`2023-05-25`
++ 🆕 实例api `createOverlay` 支持数组。
++ 🆕 `overlay`新增属性`paneId`，`defaultZLevel`和`zLevel`。
++ 🆕 `xAxis`新增方法`convertTimestampFromPixel`和`convertTimestampToPixel`。
++ 💄 优化蜡烛柱显示。
+
+## 9.3.0
+`2023-05-13`
++ 🆕 新增图表API `utils.calcTextWidth`。
++ 🆕 图表API `createIndicator(value, isStack, options)`和`setPaneOptions(options)`新增`options.axisOptions`。
++ 🆕 指标图形配置支持自定义。
++ 💄 优化bar宽度比例。
++ 💄 优化内部获取屏幕像素比。
++ 💄 优化内部id生成。
+
+
+## 9.2.2
+`2023-05-04`
++ 🐞 修复基础图形`line`事件检查可能导致错误问题。
++ 💄 优化类型检查。
+
+
 ## 9.2.1
 `2023-04-27`
 + 💄 优化默认样式，`#EF5350`变更为`#F92855`，`#26A69A`变更为`#2DC08E`。

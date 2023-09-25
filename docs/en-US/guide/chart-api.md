@@ -2,16 +2,19 @@
 
 ## init(ds, options)
 ```typescript
-(ds: string | HTMLElement, options?: {
-   locale?: string,
-   timezone?: string,
-   styles?: string | object,
-   customApi?: {
-      formatDate?: (dateTimeFormat: Intl.DateTimeFormat, timestamp: number, format: string, type: number) => string,
-      formatBigNumber?: (value: string | number) => string
-   },
-   thousandsSeparator?: string
-}) => Chart
+(
+   ds: string | HTMLElement,
+   options?: {
+      locale?: string
+      timezone?: string
+      styles?: string | object
+      customApi?: {
+         formatDate?: (dateTimeFormat: Intl.DateTimeFormat, timestamp: number, format: string, type: number) => string
+         formatBigNumber?: (value: string | number) => string
+      },
+      thousandsSeparator?: string
+   }
+) => Chart
 ```
 Initialize a chart and return the chart instance.
 - `ds` container, can be dom element or element id.
@@ -38,11 +41,11 @@ Destroys a chart, once destroyed the chart will no longer be available.
 (
    locale: string,
    locales: {
-     time: string,
-     open: string,
-     high: string,
-     low: string,
-     close: string,
+     time: string
+     open: string
+     high: string
+     low: string
+     close: string
      volume: string
    }
 ) => void
@@ -50,6 +53,12 @@ Destroys a chart, once destroyed the chart will no longer be available.
 Add a localization language. Charts have built-in `zh-CN` and `en-US`.
 - `locale` language name
 - `locales` language configuration
+
+## getOverlayClass()
+```typescript
+(name: string) => Nullable<OverlayConstructor>
+```
+Get chart's overlay attributes by overlay name.
 
 ## getSupportedLocales()
 ```typescript
@@ -70,11 +79,13 @@ Add a style configuration.
 
 ## registerFigure(figure)
 ```typescript
-(figure: {
-   name: string,
-   draw: (ctx: CanvasRenderingContext2D, attrs: any, styles: object) => void,
-   checkEventOn: (coordinate: Coordinate, attrs: any, styles: object) => boolean
-}) => void
+(
+   figure: {
+      name: string
+      draw: (ctx: CanvasRenderingContext2D, attrs: any, styles: object) => void
+      checkEventOn: (coordinate: Coordinate, attrs: any, styles: object) => boolean
+   }
+) => void
 ```
 Add a figure.
 - `figure` Basic figure information, see [figure](./figure.md) for details
@@ -97,52 +108,74 @@ Get graph class.
 
 ## registerIndicator(indicator)
 ```typescript
-(indicator: {
-   name: string,
-   shortName?: string,
-   precision?: number,
-   calcParams?: any[],
-   shouldOhlc?: boolean,
-   shouldFormatBigNumber?: boolean,
-   visible?: boolean,
-   extendData?: any,
-   series?: 'normal' | 'price' | 'volume',
-   figures?: Array<{
-      key: string,
-      title?: string,
-      type?: string,
-      baseValue?: number,
-      styles?: (
-         data: object,
-         indicator: object,
-         defaultStyles: object
-      ) => { style?: 'solid' | 'dashed' | 'stroke' | 'fill' | 'stroke_fill', color?: string }
-   }>
-   minValue?: number,
-   maxValue?: number,
-   styles?: object,
-   calc: (dataList: KLineData[], indicator: object) => Promise<object[]> | object[],
-   regenerateFigures?: (calcParms: any[]) => Array<{
-      key: string,
-      title?: string,
-      type?: string,
-      baseValue?: number,
-      styles?: (
-         data: object,
-         indicator: object,
-         defaultStyles: object
-      ) => { style?: 'solid' | 'dashed' | 'stroke' | 'fill' | 'stroke_fill', color?: string }
-   }>,
-   createTooltipDataSource?: (params: object) => {
-      name?: string,
-      calcParamsText?: string,
-      values?: Array<{
-         title: string | { text: string, color: string },
-         value: string | { text: string, color: string }
+(
+   indicator: {
+      name: string
+      shortName?: string
+      precision?: number
+      calcParams?: any[]
+      shouldOhlc?: boolean
+      shouldFormatBigNumber?: boolean
+      visible?: boolean
+      extendData?: any
+      series?: 'normal' | 'price' | 'volume'
+      figures?: Array<{
+         key: string
+         title?: string
+         type?: string
+         baseValue?: number
+         styles?: (
+            data: object,
+            indicator: object,
+            defaultStyles: object
+         ) => object
+         attrs: (
+            coordinate: object
+            bounding: Bounding
+            barSpace: BarSpace
+            xAxis: XAxis
+            yAxis: YAxis
+         ) => object
       }>
-   },
-   draw?: (params: object) => boolean
-}) => void
+      minValue?: number
+      maxValue?: number
+      styles?: object
+      calc: (dataList: KLineData[], indicator: object) => Promise<object[]> | object[]
+      regenerateFigures?: (calcParms: any[]) => Array<{
+         key: string
+         title?: string
+         type?: string
+         baseValue?: number
+         styles?: (
+            data: object
+            indicator: object
+            defaultStyles: object
+         ) => object
+         attrs: (
+            coordinate: object
+            bounding: Bounding
+            barSpace: BarSpace
+            xAxis: XAxis
+            yAxis: YAxis
+         ) => object
+      }>
+      createTooltipDataSource?: (params: object) => {
+         name?: string
+         calcParamsText?: string
+         values?: Array<{
+            title: string | {
+               text: string
+               color: string
+            }
+            value: string | {
+               text: string
+               color: string
+            }
+         }>
+      }
+      draw?: (params: object) => boolean
+   }
+) => void
 ```
 Add a technical indicator.
 - `indicator` technical indicator information
@@ -173,73 +206,78 @@ Get technical indicators for chart support.
 
 ## registerOverlay(overlay)
 ```typescript
-(overlay: {
-   name: string,
-   totalStep?: number,
-   lock?: boolean,
-   visible?: boolean,
-   needDefaultPointFigure?: boolean,
-   needDefaultXAxisFigure?: boolean,
-   needDefaultYAxisFigure?: boolean,
-   mode?: 'normal' | 'weak_magnet' | 'strong_magnet',
-   points?: Array<{ timestamp: number, dataIndex?: number, value?: number }>,
-   extendData?: any,
-   styles?: object,
-   createPointFigures?: (params: object) => {
-      key?: string,
-      type: string,
-      attrs: any | any[],
-      styles?: any,
-      ignoreEvent?: boolean | OverlayFigureIgnoreEventType[]
-   } | Array<{
-      key?: string,
-      type: string,
-      attrs: any | any[],
-      styles?: any,
-      ignoreEvent?: boolean | OverlayFigureIgnoreEventType[]
-   }>,
-   createXAxisFigures?: (params: object) => {
-      key?: string,
-      type: string,
-      attrs: any | any[],
-      styles?: any,
-      ignoreEvent?: boolean | OverlayFigureIgnoreEventType[]
-   } | Array<{
-      key?: string,
-      type: string,
-      attrs: any | any[],
-      styles?: any,
-      ignoreEvent?: boolean | OverlayFigureIgnoreEventType[]
-   }>,
-   createYAxisFigures?: (params: object) => {
-      key?: string,
-      type: string,
-      attrs: any | any[],
-      styles?: any,
-      ignoreEvent?: boolean | OverlayFigureIgnoreEventType[]
-   } | Array<{
-      key?: string,
-      type: string,
-      attrs: any | any[],
-      styles?: any,
-      ignoreEvent?: boolean | OverlayFigureIgnoreEventType[]
-   }>,
-   performEventPressedMove?: (params: object) => void,
-   performEventMoveForDrawing?: (params: object) => void,
-   onDrawStart?: (event: object) => boolean,
-   onDrawing?: (event: object) => boolean,
-   onDrawEnd?: (event: object) => boolean,
-   onClick?: (event: object) => boolean,
-   onRightClick?: (event: object) => boolean,
-   onPressedMoveStart?: (event: object) => boolean,
-   onPressedMoving?: (event: object) => boolean,
-   onPressedMoveEnd?: (event: object) => boolean,
-   onMouseEnter?: (event: object) => boolean,
-   onMouseLeave?: (event: object) => boolean,
-   onRemoved?: (event: object) => boolean,
-   onSelected?: (event: object) => boolean,
-   onDeselected?: (event: object) => boolean
-}) => void
+(
+   overlay: {
+      name: string
+      totalStep?: number
+      lock?: boolean
+      visible?: boolean
+      zLevel?: number
+      needDefaultPointFigure?: boolean
+      needDefaultXAxisFigure?: boolean
+      needDefaultYAxisFigure?: boolean
+      mode?: 'normal' | 'weak_magnet' | 'strong_magnet'
+      modeSensitivity?: number
+      points?: Array<{ timestamp: number, dataIndex?: number, value?: number }>
+      extendData?: any
+      styles?: object
+      createPointFigures?: (params: object) => {
+         key?: string
+         type: string
+         attrs: any | any[]
+         styles?: any
+         ignoreEvent?: boolean | OverlayFigureIgnoreEventType[]
+      } | Array<{
+         key?: string
+         type: string
+         attrs: any | any[]
+         styles?: any
+         ignoreEvent?: boolean | OverlayFigureIgnoreEventType[]
+      }>
+      createXAxisFigures?: (params: object) => {
+         key?: string
+         type: string
+         attrs: any | any[]
+         styles?: any
+         ignoreEvent?: boolean | OverlayFigureIgnoreEventType[]
+      } | Array<{
+         key?: string,
+         type: string,
+         attrs: any | any[]
+         styles?: any
+         ignoreEvent?: boolean | OverlayFigureIgnoreEventType[]
+      }>
+      createYAxisFigures?: (params: object) => {
+         key?: string
+         type: string
+         attrs: any | any[]
+         styles?: any
+         ignoreEvent?: boolean | OverlayFigureIgnoreEventType[]
+      } | Array<{
+         key?: string
+         type: string
+         attrs: any | any[]
+         styles?: any
+         ignoreEvent?: boolean | OverlayFigureIgnoreEventType[]
+      }>
+      performEventPressedMove?: (params: object) => void
+      performEventMoveForDrawing?: (params: object) => void
+      onDrawStart?: (event: object) => boolean
+      onDrawing?: (event: object) => boolean
+      onDrawEnd?: (event: object) => boolean
+      onClick?: (event: object) => boolean
+      onDoubleClick?: (event: object) => boolean
+      onRightClick?: (event: object) => boolean
+      onPressedMoveStart?: (event: object) => boolean
+      onPressedMoving?: (event: object) => boolean
+      onPressedMoveEnd?: (event: object) => boolean,
+      onMouseEnter?: (event: object) => boolean
+      onMouseLeave?: (event: object) => boolean
+      onRemoved?: (event: object) => boolean
+      onSelected?: (event: object) => boolean
+      onDeselected?: (event: object) => boolean
+   }
+) => void
 ```
 Add a overlay.
 - `overlay` overlay information, see [overlay](./overlay.md) for details
@@ -247,10 +285,12 @@ Add a overlay.
    - `totalStep` total implementation steps
    - `lock` is locked to prevent dragging
    - `visible` visible or not
+   - `zLevel` draw level
    - `needDefaultPointFigure` needs the default point figure
    - `needDefaultXAxisFigure` needs the default x-axis figure
    - `needDefaultYAxisFigure` needs the default y-axis figure
    - `mode` mode, options are 'normal', 'weak_magnet' and 'strong_magnet'
+   - `modeSensitivity` mode sensitivity, only valid when mode is weak_magnet
    - `points` point information
    - `extendData` extended data
    - `styles` styles
@@ -263,6 +303,7 @@ Add a overlay.
    - `onDrawing` drawing event
    - `onDrawEnd` draw end event
    - `onClick` click event
+   - `onDoubleClick` double click event
    - `onRightClick` right click event
    - `onPressedMoveStart` press start move event
    - `onPressedMoving` Press and move event
@@ -365,37 +406,74 @@ Format date. `format`, such as 'YYYY-MM-DD HH:mm:ss'.
 ```
 Format thousands separator.
 
+
+### utils.calcTextWidth(text, size, weight, family)
+```typescript
+(text: string, size?: number, weight?: string | number, family?: string) => number
+```
+Calculate text width.
+
 ### utils.getLinearSlopeIntercept(coordinate1, coordinate2)
 ```typescript
-(coordinate1: { x: number, y: number }, coordinate2: { x: number, y: number }) => []
+(
+   coordinate1: {
+      x: number
+      y: number
+   },
+   coordinate2: {
+      x: number
+      y: number
+   }
+) => []
 ```
 According to two coordinate points, get the slope and constant term of the line composed of points, namely `k` and `b` in `y = kx + b`.
 
 ### utils.getLinearYFromCoordinates(coordinate1, coordinate2, targetCoordinate)
 ```typescript
 (
-   coordinate1: { x: number, y: number },
-   coordinate2: { x: number, y: number },
-   targetCoordinate: { x: number, y: number }
+  coordinate1: {
+      x: number
+      y: number
+   },
+   coordinate2: {
+      x: number
+      y: number
+   },
+   targetCoordinate: {
+      x: number
+      y: number
+   }
 ) => number
 ```
 Get the y-axis coordinate value of a point on the line formed by two other coordinate points.
 
 ### utils.getLinearYFromSlopeIntercept(kb, targetCoordinate)
 ```typescript
-(kb: Array<number>, targetCoordinate: { x: number, y: number }) => number
+(
+   kb: Array<number>,
+   targetCoordinate: {
+      x: number
+      y: number
+   }
+) => number
 ```
 Get the y-coordinate value of a point on the line formed by the slope and the constant term.
 
 ### utils.checkCoordinateOnArc(coordinate, arc)
 ```typescript
-(coordinate: { x: number, y: number }, arc: {
-   x: number,
-   y: number,
-   r: number,
-   startAngle: number,
-   endAngle: number
-}) => boolean
+(
+   coordinate: {
+      x: number
+      y: number
+   },
+   arc: {
+      x: number
+      y: number
+      r: number
+      startAngle: number
+      endAngle: number
+   }
+) => boolean
 ```
 Check whether a certain coordinate point is on the arc.
 - `coordinate` coordinate point information
@@ -408,11 +486,17 @@ Check whether a certain coordinate point is on the arc.
 
 ### utils.checkCoordinateOnCircle(coordinate, circle)
 ```typescript
-(coordinate: { x: number, y: number }, circle: {
-   x: number,
-   y: number,
-   r: number
-}) => boolean
+(
+   coordinate: {
+      x: number
+      y: number
+   },
+   circle: {
+      x: number
+      y: number
+      r: number
+   }
+) => boolean
 ```
 Checks whether a certain coordinate point is on a circle.
 - `coordinate` coordinate point information
@@ -423,24 +507,52 @@ Checks whether a certain coordinate point is on a circle.
 
 ### utils.checkCoordinateOnLine(coordinate, line)
 ```typescript
-(coordinate: { x: number, y: number }, line: { coordinates: Array<{ x: number, y: number }> }) => boolean
+(
+   coordinate: {
+      x: number
+      y: number
+   },
+   line: {
+      coordinates: Array<{
+         x: number
+         y: number
+      }>
+   }
+) => boolean
 ```
 Check if a certain coordinate point is on the line.
 
 ### utils.checkCoordinateOnPolygon(coordinate, polygon)
 ```typescript
-(coordinate: { x: number, y: number }, polygon: { coordinates: Array<{ x: number, y: number }> }) => boolean
+(
+   coordinate: {
+      x: number
+      y: number
+   },
+   polygon: {
+      coordinates: Array<{
+         x: number
+         y: number
+      }>
+   }
+) => boolean
 ```
 Checks whether a certain coordinate point is on a polygon.
 
 ### utils.checkCoordinateOnRect(coordinate, rect)
 ```typescript
-(coordinate: { x: number, y: number }, rect: {
-   x: number,
-   y: number,
-   width: number,
-   height: number
-}) => boolean
+(
+   coordinate: {
+      x: number
+      y: number
+   },
+   rect: {
+      x: number
+      y: number
+      width: number
+      height: number
+   }
+) => boolean
 ```
 Checks whether a certain coordinate point is on a rectangle.
 - `coordinate` coordinate point information
@@ -453,18 +565,21 @@ Checks whether a certain coordinate point is on a rectangle.
 ### utils.checkCoordinateOnText(coordinate, text, styles)
 ```typescript
 (
-   coordinate: { x: number, y: number },
+   coordinate: {
+      x: number
+      y: number
+   },
    text: {
-      x: number,
-      y: number,
-      text: any,
-      align?: 'center' | 'end' | 'left' | 'right' | 'start',
+      x: number
+      y: number
+      text: any
+      align?: 'center' | 'end' | 'left' | 'right' | 'start'
       baseline?: 'alphabetic' | 'bottom' | 'hanging' | 'ideographic' | 'middle' | 'top'
    },
    styles: {
-      color?: string,
-      size?: number,
-      family?: string,
+      color?: string
+      size?: number
+      family?: string
       weight?: number | string
    }
 ) => boolean
@@ -488,16 +603,16 @@ Check if a certain coordinate point is on the text.
 (
    ctx: CanvasRenderingContext2D,
    arc: {
-      x: number,
-      y: number,
-      r: number,
-      startAngle: number,
+      x: number
+      y: number
+      r: number
+      startAngle: number
       endAngle: number
    },
    styles: {
-      style?: 'solid' | 'dashed',
-      size?: number,
-      color?: string,
+      style?: 'solid' | 'dashed'
+      size?: number
+      color?: string
       dashedValue?: number[]
    }
 ) => void
@@ -521,16 +636,16 @@ Draw an arc.
 (
    ctx: CanvasRenderingContext2D,
    circle: {
-      x: number,
-      y: number,
+      x: number
+      y: number
       r: number
    },
    styles: {
-      style?: 'stroke' | 'fill' | 'stroke_fill',
-      color?: string | CanvasGradient,
-      borderColor?: string,
-      borderSize?: number,
-      borderStyle?: 'solid' | 'dashed',
+      style?: 'stroke' | 'fill' | 'stroke_fill'
+      color?: string | CanvasGradient
+      borderColor?: string
+      borderSize?: number
+      borderStyle?: 'solid' | 'dashed'
       borderDashedValue?: Array<number>
    }
 ) => void
@@ -553,11 +668,16 @@ Draw the circle.
 ```typescript
 (
    ctx: CanvasRenderingContext2D,
-   line: { coordinates: Array<{ x: number, y: number }> },
+   line: {
+      coordinates: Array<{
+         x: number
+         y: number
+      }>
+   },
    styles: {
-      style?: 'solid' | 'dashed',
-      size?: number,
-      color?: string,
+      style?: 'solid' | 'dashed'
+      size?: number
+      color?: string
       dashedValue?: number[]
    }
 ) => void
@@ -575,13 +695,18 @@ Draw the line.
 ```typescript
 (
    ctx: CanvasRenderingContext2D,
-   polygon: { coordinates: Array<{ x: number, y: number }> },
+   polygon: {
+      coordinates: Array<{
+         x: number
+         y: number
+      }>
+   },
    styles: {
-      style?: 'stroke' | 'fill' | 'stroke_fill',
-      color?: string | CanvasGradient,
-      borderColor?: string,
-      borderSize?: number,
-      borderStyle?: 'solid' | 'dashed',
+      style?: 'stroke' | 'fill' | 'stroke_fill'
+      color?: string | CanvasGradient
+      borderColor?: string
+      borderSize?: number
+      borderStyle?: 'solid' | 'dashed'
       borderDashedValue?: Array<number>
    }
 ) => void
@@ -602,18 +727,18 @@ Draw the polygon.
 (
    ctx: CanvasRenderingContext2D,
    rect: {
-      x: number,
-      y: number,
-      width: number,
+      x: number
+      y: number
+      width: number
       height: number
    },
    styles: {
-      style?: 'stroke' | 'fill' | 'stroke_fill',
-      color?: string | CanvasGradient,
-      borderColor?: string,
-      borderSize?: number,
-      borderStyle?: 'solid' | 'dashed',
-      borderDashedValue?: Array<number>,
+      style?: 'stroke' | 'fill' | 'stroke_fill'
+      color?: string | CanvasGradient
+      borderColor?: string
+      borderSize?: number
+      borderStyle?: 'solid' | 'dashed'
+      borderDashedValue?: Array<number>
       borderRadius?: number
    }
 ) => void
@@ -635,75 +760,46 @@ Draw a rectangle.
    - `borderRadius` border radius
 
 
-### utils.drawText(ctx, text, styles)
-```typescript
-(
-   ctx: CanvasRenderingContext2D,
-   text: {
-      x: number,
-      y: number,
-      text: any,
-      align?: 'center' | 'end' | 'left' | 'right' | 'start',
-      baseline?: 'alphabetic' | 'bottom' | 'hanging' | 'ideographic' | 'middle' | 'top'
-   },
-   styles: {
-      color?: string,
-      size?: number,
-      family?: string,
-      weight?: number | string
-   }
-) => void
-```
-Draw text.
-- `ctx` canvas context
-- `text` text parameter
-   - `x` starting point x-axis value
-   - `y` starting point y-axis value
-   - `text` text content
-   - `align` horizontal alignment
-   - `baseline` vertical alignment
-- `styles` styles
-   - `color` color
-   - `size` size
-   - `family` font
-   - `weight` weight
-  
 ### utils.drawRectText(ctx, rectText, styles)
 ```typescript
 (
    ctx: CanvasRenderingContext2D,
    rectText: {
-      x: number,
-      y: number,
-      text: any,
-      align?: 'center' | 'end' | 'left' | 'right' | 'start',
+      x: number
+      y: number
+      text: any
+      width?: number
+      height?: number
+      align?: 'center' | 'end' | 'left' | 'right' | 'start'
       baseline?: 'alphabetic' | 'bottom' | 'hanging' | 'ideographic' | 'middle' | 'top'
    },
    styles: {
-      style?: 'stroke' | 'fill' | 'stroke_fill',
-      color?: string,
-      size?: number,
-      family?: string,
-      weight?: number | string,
-      paddingLeft?: number,
-      paddingTop?: number,
-      paddingRight?: number,
-      paddingBottom?: number,
-      borderStyle?: 'solid' | 'dashed',
-      borderDashedValue?: number[],
-      borderSize?: number,
-      borderColor?: string,
-      borderRadius?: number,
+      style?: 'stroke' | 'fill' | 'stroke_fill'
+      color?: string
+      size?: number
+      family?: string
+      weight?: number | string
+      paddingLeft?: number
+      paddingTop?: number
+      paddingRight?: number
+      paddingBottom?: number
+      borderStyle?: 'solid' | 'dashed'
+      borderDashedValue?: number[]
+      borderSize?: number
+      borderColor?: string
+      borderRadius?: number
       backgroundColor?: string
    }
 ) => void
 ```
-Draw text with background.
+Draw text.
 - `ctx` canvas context
 - `rectText` text parameter
    - `x` starting point x-axis value
    - `y` starting point y-axis value
    - `text` text content
+   - `width` width
+   - `height` height
    - `align` horizontal alignment
    - `baseline` vertical alignment
 - `styles` styles
@@ -722,3 +818,6 @@ Draw text with background.
    - `borderRadius` border radius size
    - `borderDashedValue` border dashed line parameter value
    - `backgroundColor` background color
+  
+### utils.drawRectText(ctx, rectText, styles)
+Same as `utils.drawRectText(ctx, text, styles)`, it is deprecated and will be deleted after v10. Please use `utils.drawRectText(ctx, text, styles)` instead.

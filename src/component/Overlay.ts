@@ -23,7 +23,7 @@ import Precision from '../common/Precision'
 import { OverlayStyle } from '../common/Options'
 import { MouseTouchEvent } from '../common/SyntheticEvent'
 
-import { clone } from '../common/utils/typeChecks'
+import { clone, merge } from '../common/utils/typeChecks'
 
 import TimeScaleStore from '../store/TimeScaleStore'
 
@@ -44,13 +44,15 @@ export interface OverlayPerformEventParams {
   performPoint: Partial<Point>
 }
 
-export type OverlayFigureIgnoreEventType = 'mouseClickEvent' | 'mouseRightClickEvent' | 'tapEvent' | 'mouseDownEvent' | 'touchStartEvent' | 'mouseMoveEvent' | 'touchMoveEvent'
+export type OverlayFigureIgnoreEventType = 'mouseClickEvent' | 'mouseRightClickEvent' | 'tapEvent' | 'doubleTapEvent' | 'mouseDownEvent' | 'touchStartEvent' | 'mouseMoveEvent' | 'touchMoveEvent' | 'mouseDoubleClickEvent'
 
 export function getAllOverlayFigureIgnoreEventTypes (): OverlayFigureIgnoreEventType[] {
   return [
     'mouseClickEvent',
+    'mouseDoubleClickEvent',
     'mouseRightClickEvent',
     'tapEvent',
+    'doubleTapEvent',
     'mouseDownEvent',
     'touchStartEvent',
     'mouseMoveEvent',
@@ -61,7 +63,7 @@ export function getAllOverlayFigureIgnoreEventTypes (): OverlayFigureIgnoreEvent
 export interface OverlayFigure {
   key?: string
   type: string
-  attrs: any | any[]
+  attrs: any
   styles?: any
   ignoreEvent?: boolean | OverlayFigureIgnoreEventType[]
 }
@@ -101,6 +103,11 @@ export interface Overlay {
   groupId: string
 
   /**
+   * Pane id
+   */
+  paneId: string
+
+  /**
    * Name
    */
   name: string
@@ -126,6 +133,16 @@ export interface Overlay {
   visible: boolean
 
   /**
+   * Default draw level
+   */
+  defaultZLevel: number
+
+  /**
+   * Draw level
+   */
+  zLevel: number
+
+  /**
    * Whether the default figure corresponding to the point is required
    */
   needDefaultPointFigure: boolean
@@ -144,6 +161,11 @@ export interface Overlay {
    * Mode
    */
   mode: OverlayMode
+
+  /**
+   * When mode is weak_magnet is the response distance
+   */
+  modeSensitivity: number
 
   /**
    * Time and value information
@@ -206,6 +228,11 @@ export interface Overlay {
   onClick: Nullable<OverlayEventCallback>
 
   /**
+   * Double Click event
+   */
+  onDoubleClick: Nullable<OverlayEventCallback>
+
+  /**
    * Right click event
    */
   onRightClick: Nullable<OverlayEventCallback>
@@ -251,10 +278,11 @@ export interface Overlay {
   onDeselected: Nullable<OverlayEventCallback>
 }
 
-export type OverlayTemplate = ExcludePickPartial<Omit<Overlay, 'id' | 'groupId' | 'points' | 'currentStep'>, 'name'>
-export type OverlayCreate = ExcludePickPartial<Omit<Overlay, 'currentStep' | 'totalStep' | 'createPointFigures' | 'createXAxisFigures' | 'createYAxisFigures' | 'performEventPressedMove' | 'performEventMoveForDrawing'>, 'name'>
+export type OverlayTemplate = ExcludePickPartial<Omit<Overlay, 'id' | 'groupId' | 'paneId' | 'defaultZLevel' | 'points' | 'currentStep'>, 'name'>
+export type OverlayCreate = ExcludePickPartial<Omit<Overlay, 'paneId' | 'currentStep' | 'totalStep' | 'defaultZLevel' | 'createPointFigures' | 'createXAxisFigures' | 'createYAxisFigures' | 'performEventPressedMove' | 'performEventMoveForDrawing'>, 'name'>
 export type OverlayRemove = Partial<Pick<Overlay, 'id' | 'groupId' | 'name'>>
-export type OverlayConstructor = new () => OverlayImp
+export type OverlayInnerConstructor = new () => OverlayImp
+export type OverlayConstructor = new () => Overlay
 
 const OVERLAY_DRAW_STEP_START = 1
 const OVERLAY_DRAW_STEP_FINISHED = -1
@@ -263,9 +291,12 @@ export const OVERLAY_ID_PREFIX = 'overlay_'
 
 export const OVERLAY_FIGURE_KEY_PREFIX = 'overlay_figure_'
 
+export const OVERLAY_ACTIVE_Z_LEVEL = Number.MAX_SAFE_INTEGER
+
 export default abstract class OverlayImp implements Overlay {
   id: string
   groupId: string
+  paneId: string
   name: string
   totalStep: number
   currentStep: number = OVERLAY_DRAW_STEP_START
@@ -274,7 +305,10 @@ export default abstract class OverlayImp implements Overlay {
   needDefaultYAxisFigure: boolean
   lock: boolean
   visible: boolean
+  zLevel: number
+  defaultZLevel: number
   mode: OverlayMode
+  modeSensitivity: number
   points: Array<Partial<Point>> = []
   extendData: any
   styles: Nullable<DeepPartial<OverlayStyle>>
@@ -287,6 +321,7 @@ export default abstract class OverlayImp implements Overlay {
   onDrawing: Nullable<OverlayEventCallback>
   onDrawEnd: Nullable<OverlayEventCallback>
   onClick: Nullable<OverlayEventCallback>
+  onDoubleClick: Nullable<OverlayEventCallback>
   onRightClick: Nullable<OverlayEventCallback>
   onPressedMoveStart: Nullable<OverlayEventCallback>
   onPressedMoving: Nullable<OverlayEventCallback>
@@ -302,13 +337,13 @@ export default abstract class OverlayImp implements Overlay {
 
   constructor (overlay: OverlayTemplate) {
     const {
-      mode, extendData, styles,
-      name, totalStep, lock, visible,
+      mode, modeSensitivity, extendData, styles,
+      name, totalStep, lock, visible, zLevel,
       needDefaultPointFigure, needDefaultXAxisFigure, needDefaultYAxisFigure,
       createPointFigures, createXAxisFigures, createYAxisFigures,
       performEventPressedMove, performEventMoveForDrawing,
       onDrawStart, onDrawing, onDrawEnd,
-      onClick, onRightClick,
+      onClick, onDoubleClick, onRightClick,
       onPressedMoveStart, onPressedMoving, onPressedMoveEnd,
       onMouseEnter, onMouseLeave, onRemoved,
       onSelected, onDeselected
@@ -317,12 +352,14 @@ export default abstract class OverlayImp implements Overlay {
     this.totalStep = (totalStep === undefined || totalStep < 2) ? 1 : totalStep
     this.lock = lock ?? false
     this.visible = visible ?? true
+    this.zLevel = zLevel ?? 0
     this.needDefaultPointFigure = needDefaultPointFigure ?? false
     this.needDefaultXAxisFigure = needDefaultXAxisFigure ?? false
     this.needDefaultYAxisFigure = needDefaultYAxisFigure ?? false
     this.mode = mode ?? OverlayMode.Normal
+    this.modeSensitivity = modeSensitivity ?? 8
     this.extendData = extendData
-    this.styles = styles ?? null
+    this.styles = styles ?? {}
     this.createPointFigures = createPointFigures ?? null
     this.createXAxisFigures = createXAxisFigures ?? null
     this.createYAxisFigures = createYAxisFigures ?? null
@@ -332,6 +369,7 @@ export default abstract class OverlayImp implements Overlay {
     this.onDrawing = onDrawing ?? null
     this.onDrawEnd = onDrawEnd ?? null
     this.onClick = onClick ?? null
+    this.onDoubleClick = onDoubleClick ?? null
     this.onRightClick = onRightClick ?? null
     this.onPressedMoveStart = onPressedMoveStart ?? null
     this.onPressedMoving = onPressedMoving ?? null
@@ -359,6 +397,18 @@ export default abstract class OverlayImp implements Overlay {
     return false
   }
 
+  setDefaultZLevel (defaultZLevel: number): boolean {
+    if (this.defaultZLevel === undefined) {
+      this.defaultZLevel = defaultZLevel
+      return true
+    }
+    return false
+  }
+
+  setPaneId (paneId: string): void {
+    this.paneId = paneId
+  }
+
   setExtendData (extendData: any): boolean {
     if (extendData !== this.extendData) {
       this.extendData = extendData
@@ -368,8 +418,8 @@ export default abstract class OverlayImp implements Overlay {
   }
 
   setStyles (styles: Nullable<DeepPartial<OverlayStyle>>): boolean {
-    if (styles !== this.styles) {
-      this.styles = styles
+    if (styles !== null) {
+      merge(this.styles, styles)
       return true
     }
     return false
@@ -428,9 +478,29 @@ export default abstract class OverlayImp implements Overlay {
     return false
   }
 
+  resetZLevel (): void {
+    this.zLevel = this.defaultZLevel
+  }
+
+  setZLevel (zLevel: number): boolean {
+    if (this.zLevel !== zLevel) {
+      this.zLevel = zLevel
+      return true
+    }
+    return false
+  }
+
   setMode (mode: OverlayMode): boolean {
-    if (mode !== this.mode) {
+    if (this.mode !== mode) {
       this.mode = mode
+      return true
+    }
+    return false
+  }
+
+  setModeSensitivity (modeSensitivity: number): boolean {
+    if (this.modeSensitivity !== modeSensitivity) {
+      this.modeSensitivity = modeSensitivity
       return true
     }
     return false
@@ -463,6 +533,14 @@ export default abstract class OverlayImp implements Overlay {
   setOnClickCallback (callback: Nullable<OverlayEventCallback>): boolean {
     if (this.onClick !== callback) {
       this.onClick = callback
+      return true
+    }
+    return false
+  }
+
+  setOnDoubleClickCallback (callback: Nullable<OverlayEventCallback>): boolean {
+    if (this.onDoubleClick !== callback) {
+      this.onDoubleClick = callback
       return true
     }
     return false
@@ -631,7 +709,7 @@ export default abstract class OverlayImp implements Overlay {
     }
   }
 
-  static extend (template: OverlayTemplate): OverlayConstructor {
+  static extend (template: OverlayTemplate): OverlayInnerConstructor {
     class Custom extends OverlayImp {
       constructor () {
         super(template)

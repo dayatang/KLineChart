@@ -13,7 +13,7 @@
  */
 
 import KLineData from '../../common/KLineData'
-import { IndicatorStyle } from '../../common/Options'
+import { IndicatorStyle, PolygonType } from '../../common/Options'
 
 import { formatValue } from '../../common/utils/format'
 
@@ -57,8 +57,8 @@ const movingAverageConvergenceDivergence: IndicatorTemplate<Macd> = {
         } else {
           color = formatValue(indicator.styles, 'bars[0].noChangeColor', (defaultStyles.bars)[0].noChangeColor) as string
         }
-        const style = prevMacd < currentMacd ? 'stroke' : 'fill'
-        return { style, color }
+        const style = prevMacd < currentMacd ? PolygonType.Stroke : PolygonType.Fill
+        return { style, color, borderColor: color }
       }
     }
   ],

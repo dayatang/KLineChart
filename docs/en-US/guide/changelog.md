@@ -1,4 +1,59 @@
 # 📠 Change Log
+
+## 9.5.4
+`2023-09-22`
++ 🐞 Fix the issue of not display the latest price line when the style `candle.type` is `area`.
++ 🐞 Fix the issue of incorrect display of the style `crosshair.vertical.text.paddingLeft`.
+
+## 9.5.3
+`2023-09-19`
++ 🐞 Fix typescript import error.
+
+## 9.5.2
+`2023-09-18`
++ 💄 Optimize the figure `text`.
++ 💄 Optimize built-in overlays `simpleAnnotation` and `simpleTag`.
++ 💄 Optimize the free style of technical indicators and support increment.
++ 🐞 Fix typescript declaration issue.
+
+## 9.5.1
+`2023-08-14`
++ 🆕 Add chart api `getOverlayClass`.
++ 🆕 Style configuration `candle.tooltip.custom` add built-in support `change`.
++ 💄 Optimize figure `rect` event trigger.
++ ↩️ Separator event trigger optimization rollback.
+
+## 9.5.0
+`2023-06-15`
++ 🆕 `Overlay` add event `onDoubleClick`, add property `modeSensitivity`.
++ 🆕 Style configuration `candle.tooltip.custom` supports string templates.
++ 🐞 Optimize the scrolling frame drop issue on the mobile side.
++ 🐞 Fix pane id naming typo.
++ 💄 Optimize the response sensitivity of dividing line events.
++ 💄 Optimize the attrs type declaration in OverlayFigure under typescript.
+
+## 9.4.0
+`2023-05-25`
++ 🆕 Instance API 'createOverlay' supports arrays.
++ 🆕 `overlay` add attributes `paneId`, `defaultZLevel` and `zLevel`.
++ 🆕 `xAxis` add methods `convertTimestampFromPixel` and `convertTimestampToPixel`.
++ 💄 Optimize the display of candle.
+
+## 9.3.0
+`2023-05-13`
++ 🆕 Add chart API `utils.calcTextWidth`.
++ 🆕 The instance APIs `createIndicator(value, isStack, options)` and `setPaneOptions(options)` have added `options. axisOptions`.
++ 🆕 The indicator graphic configuration supports customization.
++ 💄 Optimize the bar width ratio.
++ 💄 Optimize internal acquisition of screen pixel ratio.
++ 💄 Optimize internal ID generation.
+
+
+## 9.2.2
+`2023-05-04`
++ 🐞 Fix figure `line` check event error.
++ 💄 Optimize type check.
+
 ## 9.2.1
 `2023-04-27`
 + 💄 Optimize the default style by changing `#EF5350` to `#F92855` and `#26A69A` to `#2DC08E`.

@@ -21,242 +21,230 @@ new Figure(attrs, styles).draw(ctx)
 These figures are built into the chart, `arc`, `circle`, `line`, `polygon`, `rect`, `text`, `rectText`.
 ### arc
 ```typescript
-new (
+new ({
    attrs: {
      // The x-axis coordinate value of the center of the circle
-     x: number,
+     x: number
      // The y-axis coordinate value of the center of the circle
-     y: number,
+     y: number
      // radius
-     r: number,
+     r: number
      // start angle
-     startAngle: number,
+     startAngle: number
      // end angle
      endAngle: number
    },
    styles: {
      // style, optional `solid`, `dashed`
-     style?: 'solid' | 'dashed',
+     style?: 'solid' | 'dashed'
      // size
-     size?: number,
+     size?: number
      // color
-     color?: string,
+     color?: string
      // dotted line parameter
      dashedValue?: number[]
    }
-) => Figure
+}) => Figure
 ```
 
 ### circle
 ```typescript
-new (
+new ({
    attrs: {
      // The x-axis coordinate value of the center of the circle
-     x: number,
+     x: number
      // The y-axis coordinate value of the center of the circle
-     y: number,
+     y: number
      // radius
      r: number
    },
    styles: {
      // style, optional `fill`, `stroke`, `stroke_fill`
-     style?: 'fill' | 'stroke' | 'stroke_fill',
+     style?: 'fill' | 'stroke' | 'stroke_fill'
      // color
-     color?: string,
+     color?: string
      // border style
-     borderStyle?: 'solid' | 'dashed',
+     borderStyle?: 'solid' | 'dashed'
      // border color
-     borderColor?: string,
+     borderColor?: string
      // frame size
-     borderSize?: number,
+     borderSize?: number
      // border dotted line parameters
      borderDashedValue?: number[]
    }
-) => Figure
+}) => Figure
 ```
 
 ### line
 ```typescript
-new (
-   attrs: {
-     // set of coordinates
-     coordinates: Array<{ x: number, y: number }>
-   },
-   styles: {
-     // style, optional `solid`, `dashed`
-     style?: 'solid' | 'dashed',
-     // size
-     size?: number,
-     // color
-     color?: string,
-     // dotted line parameter
-     dashedValue?: number[]
-   }
-) => Figure
+new ({
+  attrs: {
+    // set of coordinates
+    coordinates: Array<{
+      x: number
+      y: number
+    }>
+  },
+  styles: {
+    // style, optional `solid`, `dashed`
+    style?: 'solid' | 'dashed'
+    // size
+    size?: number
+    // color
+    color?: string
+    // dotted line parameter
+    dashedValue?: number[]
+  }
+}) => Figure
 ```
 
 ###polygon
 ```typescript
-new (
-   attrs: {
-     // set of coordinates
-     coordinates: Array<{ x: number, y: number }>
-   },
-   styles: {
-     // style, optional `fill`, `stroke`, `stroke_fill`
-     style?: 'fill' | 'stroke' | 'stroke_fill',
-     // color
-     color?: string,
-     // border style
-     borderStyle?: 'solid' | 'dashed',
-     // border color
-     borderColor?: string,
-     // frame size
-     borderSize?: number,
-     // border dotted line parameter
-     borderDashedValue?: number[]
-   }
-) => Figure
+new ({
+  attrs: {
+    // set of coordinates
+    coordinates: Array<{
+      x: number
+      y: number
+    }>
+  },
+  styles: {
+    // style, optional `fill`, `stroke`, `stroke_fill`
+    style?: 'fill' | 'stroke' | 'stroke_fill'
+    // color
+    color?: string
+    // border style
+    borderStyle?: 'solid' | 'dashed'
+    // border color
+    borderColor?: string
+    // frame size
+    borderSize?: number
+    // border dotted line parameter
+    borderDashedValue?: number[]
+  }
+}) => Figure
 ```
 
 ### rect
 ```typescript
-new (
-   attrs: {
-     // The x-axis coordinate value of the starting point
-     x: number,
-     // The y-axis coordinate value of the starting point
-     y: number,
-     // width
-     width: number,
-     // high
-     height: number
-   },
-   styles: {
-     // style, optional `fill`, `stroke`, `stroke_fill`
-     style?: 'fill' | 'stroke' | 'stroke_fill',
-     // color
-     color?: string,
-     // border style
-     borderStyle?: 'solid' | 'dashed',
-     // border color
-     borderColor?: string,
-     // frame size
-     borderSize?: number,
-     // border dotted line parameters
-     borderDashedValue?: number[],
-     // Border fillet value
-     borderRadius?: number
-   }
-) => Figure
+new ({
+  attrs: {
+    // The x-axis coordinate value of the starting point
+    x: number
+    // The y-axis coordinate value of the starting point
+    y: number
+    // width
+    width: number
+    // high
+    height: number
+  },
+  styles: {
+    // style, optional `fill`, `stroke`, `stroke_fill`
+    style?: 'fill' | 'stroke' | 'stroke_fill'
+    // color
+    color?: string
+    // border style
+    borderStyle?: 'solid' | 'dashed'
+    // border color
+    borderColor?: string
+    // frame size
+    borderSize?: number
+    // border dotted line parameters
+    borderDashedValue?: number[]
+    // Border fillet value
+    borderRadius?: number
+  }
+}) => Figure
 ```
 
 ### text
 ```typescript
-new (
-   attrs: {
-     // The x-axis coordinate value of the starting point
-     x: number,
-     // The y-axis coordinate value of the starting point
-     y: number,
-     // text content
-     text: any,
-     // alignment
-     align: CanvasTextAlign,
+new ({
+  attrs: {
+    // The x-axis coordinate value of the starting point
+    x: number
+    // The y-axis coordinate value of the starting point
+    y: number
+    // Fixed width
+    width: number
+    // Fixed height
+    height: number
+    // text content
+    text: any
+    // alignment
+    align: CanvasTextAlign
      // benchmark
-     baseline: CanvasTextBaseline
-   },
-   styles: {
-     // color
-     color?: string,
-     // size
-     size?: number,
-     // font
-     family?: string,
-     // thickness
-     weight?: string | number,
-   }
-) => Figure
+    baseline: CanvasTextBaseline
+  },
+  styles: {
+    // style, optional `fill`, `stroke`, `stroke_fill`
+    style?: 'fill' | 'stroke' | 'stroke_fill'
+    // color
+    color?: string
+    // size
+    size?: number
+    // font
+    family?: string
+    // thickness
+    weight?: string | number
+    // left padding
+    paddingLeft?: number
+    // right padding
+    paddingRight?: number
+    // top padding
+    paddingTop?: number
+    // Bottom padding
+    paddingBottom?: number
+    // border style
+    borderStyle?: 'solid' | 'dashed'
+    // border color
+    borderColor?: string
+    // frame size
+    borderSize?: number
+    // border dotted line parameter
+    borderDashedValue?: number[]
+    // Border fillet value
+    borderRadius?: number
+    // background color
+    backgroundColor?: string | CanvasGradient
+  }
+}) => Figure
 ```
 
 ### rectText
-```typescript
-new (
-   attrs: {
-     // The x-axis coordinate value of the starting point
-     x: number,
-     // The y-axis coordinate value of the starting point
-     y: number,
-     // text content
-     text: any,
-     // alignment
-     align: CanvasTextAlign,
-     // benchmark
-     baseline: CanvasTextBaseline
-   },
-   styles: {
-     // style, optional `fill`, `stroke`, `stroke_fill`
-     style?: 'fill' | 'stroke' | 'stroke_fill',
-     // color
-     color?: string,
-     // size
-     size?: number,
-     // font
-     family?: string,
-     // thickness
-     weight?: string | number,
-     // left padding
-     paddingLeft?: number,
-     // right padding
-     paddingRight?: number,
-     // top padding
-     paddingTop?: number,
-     // Bottom padding
-     paddingBootom?: number,
-     // border style
-     borderStyle?: 'solid' | 'dashed',
-     // border color
-     borderColor?: string,
-     // frame size
-     borderSize?: number,
-     // border dotted line parameter
-     borderDashedValue?: number[],
-     // Border fillet value
-     borderRadius?: number,
-     // background color
-     backgroundColor?: string | CanvasGradient
-   }
-) => Figure
-```
+Same as `text`, it is deprecated and will be deleted after v10. Please use `text` instead.
 
 ## Customize figure
 To create a custom figure, you only need to generate the figure information, and then add it globally through `klinecharts.registerFigure`, and add it to the chart to use it like the built-in figures.
 
 ### Attribute description
-```javascript
+```typescript
 {
-   // Figure name, a required field, is the unique identifier for creation
-   name: string,
+  // Figure name, a required field, is the unique identifier for creation
+  name: string
 
-   // Check whether the event is on the graph, return a boolean value
-   checkEventOn: (
-     // coordinates of the event
-     coordinate: { x: number, y: number },
-     // graphics properties
-     attrs: any,
+  // Check whether the event is on the graph, return a boolean value
+  checkEventOn: (
+    // coordinates of the event
+    coordinate: {
+      x: number
+      y: number
+    },
+    // graphics properties
+    attrs: any,
      // style of the graph
-     styles: any
-   ) => boolean,
+    styles: any
+  ) => boolean
 
-   // draw
-   draw: (
-     // canvas context
-     ctx: CanvasRenderingContext2D,
-     // figure properties
-     attrs: any,
-     // style of the figure
-     styles: any
-   ) => void
+  // draw
+  draw: (
+    // canvas context
+    ctx: CanvasRenderingContext2D,
+    // figure properties
+    attrs: any,
+    // style of the figure
+    styles: any
+  ) => void
 }
 ```
 

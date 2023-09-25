@@ -6,17 +6,17 @@
 ```
 获取dom容器。
 - `paneId` 窗口id，缺省则是整个图表容器
-- `position` 可选项为'root'，'main'和'yAxis'，缺省则是'root'
+- `position` 支持`root`，`main`，`yAxis`，缺省则是`root`
 
 
 ## getSize(paneId, position)
 ```typescript
 (paneId?: string, position?: 'root' | 'main' | 'yAxis') => {
-  width: number,
-  height: number,
-  left: number,
-  top: number,
-  right: number,
+  width: number
+  height: number
+  left: number
+  top: number
+  right: number
   bottom: number
 }
 ```
@@ -136,7 +136,12 @@
 
 ## getVisibleRange()
 ```typescript
-() => { from: number, to: number, realFrom: number, realTo: number }
+() => {
+  from: number
+  to: number
+  realFrom: number
+  realTo: number
+}
 ```
 获取可见区间范围。
 
@@ -144,11 +149,11 @@
 ```typescript
 (
   dataList：Array<{
-    timestamp: number,
-    open: number,
-    close: number,
-    high: number,
-    low: number,
+    timestamp: number
+    open: number
+    close: number
+    high: number
+    low: number
     volume?: number,
     turnover?: number
   }>,
@@ -166,12 +171,12 @@
 ```typescript
 (
   dataList：Array<{
-    timestamp: number,
-    open: number,
-    close: number,
-    high: number,
-    low: number,
-    volume?: number,
+    timestamp: number
+    open: number
+    close: number
+    high: number
+    low: number
+    volume?: number
     turnover?: number
   }>,
   more?: boolean,
@@ -188,12 +193,12 @@
 ```typescript
 (
   data: {
-    timestamp: number,
-    open: number,
-    close: number,
-    high: number,
-    low: number,
-    volume?: number,
+    timestamp: number
+    open: number
+    close: number
+    high: number
+    low: number
+    volume?: number
     turnover?: number
   },
   callback?: () => void
@@ -207,12 +212,12 @@
 ## getDataList()
 ```typescript
 () => Array<{
-  timestamp: number,
-  open: number,
-  close: number,
-  high: number,
-  low: number,
-  volume?: number,
+  timestamp: number
+  open: number
+  close: number
+  high: number
+  low: number
+  volume?: number
   turnover?: number
 }>
 ```
@@ -238,60 +243,75 @@
 ```typescript
 (
   value: string | {
-  name: string,
-    shortName?: string,
-    precision?: number,
-    calcParams?: any[],
-    shouldOhlc?: boolean,
-    shouldFormatBigNumber?: boolean,
-    visible?: boolean,
-    extendData?: any,
-    series?: 'normal' | 'price' | 'volume',
+    name: string
+    shortName?: string
+    precision?: number
+    calcParams?: any[]
+    shouldOhlc?: boolean
+    shouldFormatBigNumber?: boolean
+    visible?: boolean
+    extendData?: any
+    series?: 'normal' | 'price' | 'volume'
     figures?: Array<{
-      key: string,
-      title?: string,
-      type?: string,
-      baseValue?: number,
+      key: string
+      title?: string
+      type?: string
+      baseValue?: number
       styles?: (
         data: object,
         indicator: object,
         defaultStyles: object
-      ) => { style?: 'solid' | 'dashed' | 'stroke' | 'fill' | 'stroke_fill', color?: string }
+      ) => {
+        style?: 'solid' | 'dashed' | 'stroke' | 'fill' | 'stroke_fill'
+        color?: string
+      }
     }>
-    minValue?: number,
-    maxValue?: number,
-    styles?: object,
-    calc?: (dataList: KLineData[], indicator: object) => Promise<object[]> | object[],
+    minValue?: number
+    maxValue?: number
+    styles?: object
+    calc?: (dataList: KLineData[], indicator: object) => Promise<object[]> | object[]
     regenerateFigures?: (calcParms: any[]) => Array<{
-      key: string,
-      title?: string,
-      type?: string,
-      baseValue?: number,
+      key: string
+      title?: string
+      type?: string
+      baseValue?: number
       styles?: (
         data: object,
         indicator: object,
         defaultStyles: object
-      ) => { style?: 'solid' | 'dashed' | 'stroke' | 'fill' | 'stroke_fill', color?: string }
+      ) => {
+        style?: 'solid' | 'dashed' | 'stroke' | 'fill' | 'stroke_fill'
+        color?: string
+      }
     }>,
     createTooltipDataSource?: (params: object) => {
-      name?: string,
-      calcParamsText?: string,
+      name?: string
+      calcParamsText?: string
       values?: Array<{
-        title: string | { text: string, color: string },
-        value: string | { text: string, color: string }
+        title: string | {
+          text: string
+          color: string
+        }
+        value: string | {
+          text: string
+          color: string
+        }
       }>
-    },
+    }
     draw?: (params: object) => boolean
   },
   isStack?: boolean,
   paneOptions?: {
-    id?: string,
-    height?: number,
-    minHeight?: number,
+    id?: string
+    height?: number
+    minHeight?: number
     dragEnabled?: boolean
     gap?: {
-      top?: number,
+      top?: number
       bottom?: number
+    }
+    axisOptions?: {
+      scrollZoomEnabled?: boolean
     }
   } | null,
   callback?: () => void
@@ -301,13 +321,16 @@
 - `value` 技术指标名或者技术指标对象，当是对象时，类型和图表方法`overrideIndicator`的入参一致
 - `isStack` 是否覆盖
 - `paneOptions` 窗口配置信息，可缺省
-   - `id` 窗口id，可缺省
-   - `height` 窗口高度，可缺省
-   - `minHeight` 窗口最小高度，可缺省
-   - `dragEnbaled` 窗口是否可以拖拽调整高度，可缺省
-   - `gap` 边距
-     - `top` 上边距，值小余1则是百分比
-     - `bottom` 下边距，值小余1则是百分比
+  - `id` 窗口id，可缺省
+  - `height` 窗口高度，可缺省
+  - `minHeight` 窗口最小高度，可缺省
+  - `dragEnbaled` 窗口是否可以拖拽调整高度，可缺省
+  - `gap` 边距
+    - `top` 上边距，值小余1则是百分比
+    - `bottom` 下边距，值小余1则是百分比
+  - `axisOptions`
+    - `scrollZoomEnabled` 轴上是否可以滚动缩放
+  
 - `callback` 指标创建完成回调方法
 ::: tip 特殊的id
 'candle_pane'，主图的窗口id。
@@ -315,12 +338,13 @@
 
 示例：
 ```javascript
-chart.createTechnicalIndicator('MA', false, {
+chart.createIndicator('MA', false, {
   id: 'pane_1',
   height: 100,
   minHeight: 30,
   dragEnabled: true,
-  gap: { top: 0.2, bottom: 0.1 }
+  gap: { top: 0.2, bottom: 0.1 },
+  axisOptions: { scrollZoomEnabled: true }
 }, () => {})
 ```
 
@@ -329,49 +353,61 @@ chart.createTechnicalIndicator('MA', false, {
 ```typescript
 (
   override: {
-    name: string,
-    shortName?: string,
-    precision?: number,
-    calcParams?: any[],
-    shouldOhlc?: boolean,
-    shouldFormatBigNumber?: boolean,
-    visible?: boolean,
-    extendData?: any,
-    series?: 'normal' | 'price' | 'volume',
+    name: string
+    shortName?: string
+    precision?: number
+    calcParams?: any[]
+    shouldOhlc?: boolean
+    shouldFormatBigNumber?: boolean
+    visible?: boolean
+    extendData?: any
+    series?: 'normal' | 'price' | 'volume'
     figures?: Array<{
-      key: string,
-      title?: string,
-      type?: string,
-      baseValue?: number,
+      key: string
+      title?: string
+      type?: string
+      baseValue?: number
       styles?: (
         data: object,
         indicator: object,
         defaultStyles: object
-      ) => { style?: 'solid' | 'dashed' | 'stroke' | 'fill' | 'stroke_fill', color?: string }
+      ) => {
+        style?: 'solid' | 'dashed' | 'stroke' | 'fill' | 'stroke_fill'
+        color?: string
+      }
     }>
-    minValue?: number,
-    maxValue?: number,
-    styles?: object,
-    calc?: (dataList: KLineData[], indicator: object) => Promise<object[]> | object[],
+    minValue?: number
+    maxValue?: number
+    styles?: object
+    calc?: (dataList: KLineData[], indicator: object) => Promise<object[]> | object[]
     regenerateFigures?: (calcParms: any[]) => Array<{
-      key: string,
-      title?: string,
-      type?: string,
-      baseValue?: number,
+      key: string
+      title?: string
+      type?: string
+      baseValue?: number
       styles?: (
         data: object,
         indicator: object,
         defaultStyles: object
-      ) => { style?: 'solid' | 'dashed' | 'stroke' | 'fill' | 'stroke_fill', color?: string }
+      ) => {
+        style?: 'solid' | 'dashed' | 'stroke' | 'fill' | 'stroke_fill'
+        color?: string
+      }
     }>,
     createTooltipDataSource?: (params: object) => {
-      name?: string,
-      calcParamsText?: string,
+      name?: string
+      calcParamsText?: string
       values?: Array<{
-        title: string | { text: string, color: string },
-        value: string | { text: string, color: string }
+        title: string | {
+          text: string
+          color: string 
+        }
+        value: string | {
+          text: string
+          color: string
+        }
       }>
-    },
+    }
     draw?: (params: object) => boolean
   },
   paneId?: string | null,
@@ -479,32 +515,72 @@ chart.overrideIndicator({
 ```typescript
 (
   value: string | {
-    name: string,
-    id?: string,
-    groupId?: string, 
-    lock?: boolean,
-    visible?: boolean,
-    needDefaultPointFigure?: boolean,
-    needDefaultXAxisFigure?: boolean,
-    needDefaultYAxisFigure?: boolean,
-    mode?: 'normal' | 'weak_magnet' | 'strong_magnet',
-    points?: Array<{ timestamp?: number, dataIndex?: number, value?: number }>,
-    extendData?: any,
-    styles?: object,
-    onDrawStart?: (event: object) => boolean,
-    onDrawing?: (event: object) => boolean,
-    onDrawEnd?: (event: object) => boolean,
-    onClick?: (event: object) => boolean,
-    onRightClick?: (event: object) => boolean,
-    onPressedMoveStart?: (event: object) => boolean,
-    onPressedMoving?: (event: object) => boolean,
-    onPressedMoveEnd?: (event: object) => boolean,
-    onMouseEnter?: (event: object) => boolean,
-    onMouseLeave?: (event: object) => boolean,
-    onRemoved?: (event: object) => boolean,
-    onSelected?: (event: object) => boolean,
+    name: string
+    id?: string
+    groupId?: string
+    lock?: boolean
+    visible?: boolean
+    zLevel?: number
+    needDefaultPointFigure?: boolean
+    needDefaultXAxisFigure?: boolean
+    needDefaultYAxisFigure?: boolean
+    mode?: 'normal' | 'weak_magnet' | 'strong_magnet'
+    modeSensitivity?: number
+    points?: Array<{
+      timestamp?: number
+      dataIndex?: number
+      value?: number
+    }>
+    extendData?: any
+    styles?: object
+    onDrawStart?: (event: object) => boolean
+    onDrawing?: (event: object) => boolean
+    onDrawEnd?: (event: object) => boolean
+    onClick?: (event: object) => boolean
+    onDoubleClick?: (event: object) => boolean
+    onRightClick?: (event: object) => boolean
+    onPressedMoveStart?: (event: object) => boolean
+    onPressedMoving?: (event: object) => boolean
+    onPressedMoveEnd?: (event: object) => boolean
+    onMouseEnter?: (event: object) => boolean
+    onMouseLeave?: (event: object) => boolean
+    onRemoved?: (event: object) => boolean
+    onSelected?: (event: object) => boolean
     onDeselected?: (event: object) => boolean
-  },
+  } | Array<string | {
+    name: string
+    id?: string
+    groupId?: string
+    lock?: boolean
+    visible?: boolean
+    zLevel?: number
+    needDefaultPointFigure?: boolean
+    needDefaultXAxisFigure?: boolean
+    needDefaultYAxisFigure?: boolean
+    mode?: 'normal' | 'weak_magnet' | 'strong_magnet'
+    modeSensitivity?: number
+    points?: Array<{
+      timestamp?: number
+      dataIndex?: number
+      value?: number
+    }>
+    extendData?: any
+    styles?: object
+    onDrawStart?: (event: object) => boolean
+    onDrawing?: (event: object) => boolean
+    onDrawEnd?: (event: object) => boolean
+    onClick?: (event: object) => boolean
+    onDoubleClick?: (event: object) => boolean
+    onRightClick?: (event: object) => boolean
+    onPressedMoveStart?: (event: object) => boolean
+    onPressedMoving?: (event: object) => boolean
+    onPressedMoveEnd?: (event: object) => boolean
+    onMouseEnter?: (event: object) => boolean
+    onMouseLeave?: (event: object) => boolean
+    onRemoved?: (event: object) => boolean
+    onSelected?: (event: object) => boolean
+    onDeselected?: (event: object) => boolean
+  }>,
   paneId?: string
 ) => string | null
 ```
@@ -535,7 +611,9 @@ chart.createOverlay({
   },
   lock: false,
   visible: true,
+  zLevel: 0,
   mode: 'weak_magnet',
+  modeSensitivity: 8,
   extendData: 'xxxxxxxx',
   needDefaultPointFigure: false,
   needDefaultXAxisFigure: false,
@@ -544,6 +622,7 @@ chart.createOverlay({
   onDrawing: function (event) { console.log(event) },
   onDrawEnd: function (event) { console.log(event) },
   onClick: function (event) { console.log(event) },
+  onDoubleClick: function (event) { console.log(event) },
   onRightClick: function (event) {
     console.log(event)
     return false
@@ -572,30 +651,37 @@ chart.createOverlay({
 ```typescript
 (
   override: {
-    name: string,
-    id?: string,
-    groupId?: string,
-    lock?: boolean,
-    visible?: boolean,
-    needDefaultPointFigure?: boolean,
-    needDefaultXAxisFigure?: boolean,
-    needDefaultYAxisFigure?: boolean,
-    mode?: 'normal' | 'weak_magnet' | 'strong_magnet',
-    points?: Array<{ timestamp?: number, dataIndex?: number, value?: number }>,
-    extendData?: any,
-    styles?: object,
-    onDrawStart?: (event: object) => boolean,
-    onDrawing?: (event: object) => boolean,
-    onDrawEnd?: (event: object) => boolean,
-    onClick?: (event: object) => boolean,
-    onRightClick?: (event: object) => boolean,
-    onPressedMoveStart?: (event: object) => boolean,
-    onPressedMoving?: (event: object) => boolean,
-    onPressedMoveEnd?: (event: object) => boolean,
-    onMouseEnter?: (event: object) => boolean,
-    onMouseLeave?: (event: object) => boolean,
-    onRemoved?: (event: object) => boolean,
-    onSelected?: (event: object) => boolean,
+    name: string
+    id?: string
+    groupId?: string
+    lock?: boolean
+    visible?: boolean
+    zLevel?: number
+    needDefaultPointFigure?: boolean
+    needDefaultXAxisFigure?: boolean
+    needDefaultYAxisFigure?: boolean
+    mode?: 'normal' | 'weak_magnet' | 'strong_magnet'
+    modeSensitivity?: number
+    points?: Array<{
+      timestamp?: number
+      dataIndex?: number
+      value?: number
+    }>
+    extendData?: any
+    styles?: object
+    onDrawStart?: (event: object) => boolean
+    onDrawing?: (event: object) => boolean
+    onDrawEnd?: (event: object) => boolean
+    onClick?: (event: object) => boolean
+    onDoubleClick?: (event: object) => boolean
+    onRightClick?: (event: object) => boolean
+    onPressedMoveStart?: (event: object) => boolean
+    onPressedMoving?: (event: object) => boolean
+    onPressedMoveEnd?: (event: object) => boolean
+    onMouseEnter?: (event: object) => boolean
+    onMouseLeave?: (event: object) => boolean
+    onRemoved?: (event: object) => boolean
+    onSelected?: (event: object) => boolean
     onDeselected?: (event: object) => boolean
   }
 ) => string | null
@@ -607,10 +693,12 @@ chart.createOverlay({
   - `groupId` 编组id
   - `lock` 是否锁定不让拖动
   - `visible` 是否可见
+  - `zLevel` 绘制层级，值越大越靠前显示
   - `needDefaultPointFigure` 是否需要默认的点对应的图形
   - `needDefaultXAxisFigure` 是否需要默认的x轴上的图形
   - `needDefaultYAxisFigure` 是否需要默认的y轴上的图形
   - `mode` 模式，可选项有'normal'，'weak_magnet'和'strong_magnet'
+  - `modeSensitivity` 模式灵敏度，仅 mode 是 weak_magnet 时有效
   - `points` 点信息
   - `extendData` 扩展数据
   - `styles` 样式
@@ -618,6 +706,7 @@ chart.createOverlay({
   - `onDrawing` 绘制中事件
   - `onDrawEnd` 绘制结束事件
   - `onClick` 点击事件
+  - `onDoubleClick` 双击事件
   - `onRightClick` 右击事件
   - `onPressedMoveStart` 按住开始移动事件
   - `onPressedMoving` 按住移动中事件
@@ -648,7 +737,9 @@ chart.overrideOverlay({
   },
   lock: false,
   visible: true,
+  zLevel: 0,
   mode: 'weak_magnet',
+  modeSensitivity: 8,
   extendData: 'xxxxxxxx',
   needDefaultPointFigure: false,
   needDefaultXAxisFigure: false,
@@ -657,6 +748,7 @@ chart.overrideOverlay({
   onDrawing: function (event) { console.log(event) },
   onDrawEnd: function (event) { console.log(event) },
   onClick: function (event) { console.log(event) },
+  onDoubleClick: function (event) { console.log(event) },
   onRightClick: function (event) {
     console.log(event)
     return false
@@ -677,8 +769,8 @@ chart.overrideOverlay({
 ```typescript
 (
   remove: string | {
-    id?: string,
-    groupId?: string,
+    id?: string
+    groupId?: string
     name?: string
   }
 ) => void
@@ -729,7 +821,14 @@ chart.overrideOverlay({
 
 ## zoomAtCoordinate(scale, coordinate, animationDuration)
 ```typescript
-(scale: number, coordinate?: { x: number, y: number }, animationDuration?: number) => void
+(
+  scale: number,
+  coordinate?: {
+    x: number
+    y: number
+  },
+  animationDuration?: number
+) => void
 ```
 在某个坐标点缩放。
 - `scale` 缩放比例
@@ -759,26 +858,33 @@ chart.overrideOverlay({
 
 ## setPaneOptions(options)
 ```typescript
-(options: {
-  id: string,
-  height?: number,
-  minHeight?: number,
-  dragEnabled?: boolean
-  gap?: {
-    top?: number,
-    bottom?: number
+(
+  options: {
+    id: string
+    height?: number
+    minHeight?: number
+    dragEnabled?: boolean
+    gap?: {
+      top?: number
+      bottom?: number
+    }
+    axisOptions?: {
+      scrollZoomEnabled?: boolean
+    }
   }
-}) => void
+) => void
 ```
 设置窗口配置。
 - `paneOptions` 窗口配置信息，可缺省
-   - `id` 窗口id
-   - `height` 窗口高度，可缺省
-   - `minHeight` 窗口最小高度，可缺省
-   - `dragEnbaled` 窗口是否可以拖拽调整高度，可缺省
-   - `gap` 边距
-     - `top` 上边距，值小余1则是百分比
-     - `bottom` 下边距，值小余1则是百分比
+  - `id` 窗口id
+  - `height` 窗口高度，可缺省
+  - `minHeight` 窗口最小高度，可缺省
+  - `dragEnbaled` 窗口是否可以拖拽调整高度，可缺省
+  - `gap` 边距
+    - `top` 上边距，值小余1则是百分比
+    - `bottom` 下边距，值小余1则是百分比
+  - `axisOptions`
+    - `scrollZoomEnabled` 轴上是否可以滚动缩放
 ::: tip 特殊的id
 'candle_pane'，主图的窗口id。
 :::
@@ -790,7 +896,8 @@ chart.setPaneOptions({
   height: 100,
   minHeight: 3,
   dragEnabled: true,
-  gap: { top: 0.2, bottom: 0.1 }
+  gap: { top: 0.2, bottom: 0.1 },
+  axisOptions: { scrollZoomEnabled: true }
 })
 ```
 
@@ -834,16 +941,16 @@ chart.setPaneOptions({
 ```typescript
 (
   value: {
-    dataIndex?: number,
-    timestamp?: number,
+    dataIndex?: number
+    timestamp?: number
     value?: number
   } | Array<{
-    dataIndex?: number,
-    timestamp?: number,
+    dataIndex?: number
+    timestamp?: number
     value?: number
   }>,
   finder: {
-    paneId?: string,
+    paneId?: string
     absolute?: boolean
   }
 ) => { x: number?, y?: number } | Array<{ x?: number, y?: number }>
@@ -861,18 +968,24 @@ chart.setPaneOptions({
 ## convertFromPixel(coordinate, finder)
 ```typescript
 (
-  coordinate: { x: number?, y?: number } | Array<{ x?: number, y?: number },
+  coordinate: {
+    x?: number
+    y?: number
+  } | Array<{
+    x?: number
+    y?: number
+  },
   finder: {
-    paneId?: string,
+    paneId?: string
     absolute?: boolean
   }
 ) => {
-    dataIndex?: number,
-    timestamp?: number,
+    dataIndex?: number
+    timestamp?: number
     value?: number
   } | Array<{
-    dataIndex?: number,
-    timestamp?: number,
+    dataIndex?: number
+    timestamp?: number
     value?: number
   }>
 ```

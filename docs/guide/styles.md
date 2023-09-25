@@ -103,7 +103,8 @@ import StyleExplain from '../components/StyleExplain.vue'
           paddingBottom: 4,
           // 'solid' | 'dashed'
           borderStyle: 'solid',
-          borderSize: 1,
+          borderSize: 0,
+          borderColor: 'transparent',
           borderDashedValue: [2, 2],
           color: '#FFFFFF',
           family: 'Helvetica Neue',
@@ -118,9 +119,12 @@ import StyleExplain from '../components/StyleExplain.vue'
       showRule: 'always',
       // 'standard' | 'rect'
       showType: 'standard',
-      // 显示回调方法，返回数据格式类型需要时一个数组
+      // 自定义显示，可以是回调方法也可以是数组，当是一个方法时，需要返回一个数组
       // 数组的子项类型为 { title, value }
       // title和value可以是字符串或者对象，对象类型为 { text, color }
+      // title 或者 title.text 可以是国际化的 key，
+      // value 或者 value.text 支持字符串模版
+      // 例如：想显示时间，开盘和收盘，配置[{ title: 'time', value: '{time}' }, { title: 'open', value: '{open}' }, { title: 'close', value: '{close}' }]
       custom: null
       defaultValue: 'n/a',
       rect: {
@@ -314,8 +318,8 @@ import StyleExplain from '../components/StyleExplain.vue'
       family: 'Helvetica Neue',
       weight: 'normal',
       size: 12,
-      marginStrat: 4,
-      marginBottom: 4
+      marginStart: 4,
+      marginEnd: 4
     },
     // x轴分割线
     tickLine: {
@@ -348,8 +352,8 @@ import StyleExplain from '../components/StyleExplain.vue'
       family: 'Helvetica Neue',
       weight: 'normal',
       size: 12,
-      marginStrat: 4,
-      marginBottom: 4
+      marginStart: 4,
+      marginEnd: 4
     },
     // x轴分割线
     tickLine: {
@@ -493,10 +497,23 @@ import StyleExplain from '../components/StyleExplain.vue'
       dashedValue: [2, 2]
     },
     text: {
-      color: '#1677FF',
+      // 'fill' | 'stroke' | 'stroke_fill'
+      style: 'fill',
+      color: '#FFFFFF',
       size: 12,
       family: 'Helvetica Neue',
-      weight: 'normal'
+      weight: 'normal',
+      // 'solid' | 'dashed'
+      borderStyle: 'solid',
+      borderDashedValue: [2, 2],
+      borderSize: 0,
+      borderRadius: 2,
+      borderColor: '#1677FF',
+      paddingLeft: 0,
+      paddingRight: 0,
+      paddingTop: 0,
+      paddingBottom: 0,
+      backgroundColor: 'transparent'
     },
     rectText: {
       // 'fill' | 'stroke' | 'stroke_fill'

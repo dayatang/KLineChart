@@ -48,8 +48,10 @@ import { checkCoordinateOnText, drawText } from './extension/figure/text'
 import { registerFigure, getSupportedFigures, getFigureClass } from './extension/figure/index'
 import { registerIndicator, getSupportedIndicators } from './extension/indicator/index'
 import { registerLocale, getSupportedLocales } from './extension/i18n/index'
-import { registerOverlay, getSupportedOverlays } from './extension/overlay/index'
+import { registerOverlay, getOverlayClass, getSupportedOverlays } from './extension/overlay/index'
 import { registerStyles } from './extension/styles/index'
+
+import Nullable from './common/Nullable'
 
 import { logError, logTag, logWarn } from './common/utils/logger'
 
@@ -57,8 +59,9 @@ import {
   clone, merge, isString, isNumber, isValid, isObject, isArray, isFunction, isBoolean
 } from './common/utils/typeChecks'
 import { formatValue, formatPrecision, formatBigNumber, formatDate, formatThousands } from './common/utils/format'
+import { calcTextWidth } from './common/utils/canvas'
 
-const instances: {[id: string]: Chart} = {}
+const instances = new Map<string, ChartImp>()
 let chartBaseId = 1
 
 /**
@@ -75,53 +78,51 @@ function version (): string {
  * @param options
  * @returns {Chart}
  */
-function init (ds: HTMLElement | string, options?: Options): Chart | null {
+function init (ds: HTMLElement | string, options?: Options): Nullable<Chart> {
   logTag()
-  const errorMessage = 'The chart cannot be initialized correctly. Please check the parameters. The chart container cannot be null and child elements need to be added!!!'
-  let dom
+  let dom: Nullable<HTMLElement>
   if (isString(ds)) {
-    dom = document.getElementById(ds as string)
+    dom = document.getElementById(ds)
   } else {
     dom = ds
   }
   if (dom === null) {
-    logError('', '', errorMessage)
+    logError('', '', 'The chart cannot be initialized correctly. Please check the parameters. The chart container cannot be null and child elements need to be added!!!')
     return null
   }
-  let chart = instances[dom.chartId ?? '']
+  let chart = instances.get(dom.id)
   if (chart !== undefined) {
     logWarn('', '', 'The chart has been initialized on the dom！！！')
     return chart
   }
   const id = `k_line_chart_${chartBaseId++}`
   chart = new ChartImp(dom, options)
-  // @ts-expect-error
   chart.id = id
-  dom.chartId = id
-  instances[id] = chart
+  dom.setAttribute('k-line-chart-id', id)
+  instances.set(id, chart)
   return chart
 }
 
 /**
- * Destory chart instace
+ * Destroy chart instance
  * @param dcs
  */
 function dispose (dcs: HTMLElement | Chart | string): void {
-  let id: string | null
-  if (isString(dcs)) {
-    const dom = document.getElementById(dcs as string)
-    id = dom?.getAttribute('chartId') ?? null
-  } else if (dcs instanceof ChartImp) {
-    // @ts-expect-error
+  let id: Nullable<string>
+  if (dcs instanceof ChartImp) {
     id = dcs.id
   } else {
-    // @ts-expect-error
-    id = dcs ?? dcs.chartId
+    let dom: Nullable<HTMLElement>
+    if (isString(dcs)) {
+      dom = document.getElementById(dcs)
+    } else {
+      dom = dcs as HTMLElement
+    }
+    id = dom?.getAttribute('k-line-chart-id') ?? null
   }
   if (id !== null) {
-    instances[id].destroy()
-    // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
-    delete instances[id]
+    instances.get(id)?.destroy()
+    instances.delete(id)
   }
 }
 
@@ -140,6 +141,7 @@ const utils = {
   formatBigNumber,
   formatDate,
   formatThousands,
+  calcTextWidth,
   getLinearSlopeIntercept,
   getLinearYFromSlopeIntercept,
   getLinearYFromCoordinates,
@@ -162,7 +164,7 @@ export {
   version, init, dispose,
   registerFigure, getSupportedFigures, getFigureClass,
   registerIndicator, getSupportedIndicators,
-  registerOverlay, getSupportedOverlays,
+  registerOverlay, getSupportedOverlays, getOverlayClass,
   registerLocale, getSupportedLocales,
   registerStyles, utils,
   LineType, PolygonType, TooltipShowRule, TooltipShowType, TooltipIconPosition,
